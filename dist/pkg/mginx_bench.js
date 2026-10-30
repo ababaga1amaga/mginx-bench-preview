@@ -20,7 +20,7 @@ export function cascade_meta(spec) {
 }
 
 /**
- * WASM/JS API for multi-worker cascades: each worker loads its own module instance and sums a stop[0] range.
+ * Legacy aliases kept for existing JS callers.
  * @param {string} spec
  * @param {number} lo
  * @param {number} hi
@@ -55,7 +55,7 @@ export function solve(spec) {
 }
 
 /**
- * Generic range API for splittable kernels (cascade: reel-1 stops; waysDp/megaways: reel-1 stops). Returns the partial EV numerator / its own scale.
+ * Partial EV for reel-1 stops [lo,hi) of a `parallel: stopRange` plan (stopEnum cascades, columnDP ways).
  * @param {string} spec
  * @param {number} lo
  * @param {number} hi
@@ -71,7 +71,7 @@ export function solve_range(spec, lo, hi) {
 }
 
 /**
- * {"n0": number of reel-1 stops} for splittable kinds, {"n0":0} otherwise.
+ * {"n0": reel-1 stops} for stopRange plans, {"n0":0} otherwise.
  * @param {string} spec
  * @returns {string}
  */
