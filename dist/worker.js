@@ -1,4 +1,4 @@
-// ../node_modules/@noble/hashes/_u64.js
+// node_modules/@noble/hashes/_u64.js
 var fromNumH = (n) => n / 2 ** 32 | 0;
 var fromNumL = (n) => n >>> 0;
 function setU64FromNum(view, byteOffset, n, isLE) {
@@ -8,7 +8,7 @@ function setU64FromNum(view, byteOffset, n, isLE) {
   view.setUint32(byteOffset + 4, isLE ? h : l, isLE);
 }
 
-// ../node_modules/@noble/hashes/utils.js
+// node_modules/@noble/hashes/utils.js
 function isBytes(a) {
   return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array" && "BYTES_PER_ELEMENT" in a && a.BYTES_PER_ELEMENT === 1;
 }
@@ -95,7 +95,7 @@ var oidNist = (suffix) => ({
   oid: Uint8Array.from([6, 9, 96, 134, 72, 1, 101, 3, 4, 2, suffix])
 });
 
-// ../node_modules/@noble/hashes/_md.js
+// node_modules/@noble/hashes/_md.js
 function Chi(a, b, c2) {
   return a & b ^ ~a & c2;
 }
@@ -208,7 +208,7 @@ var SHA256_IV = /* @__PURE__ */ Uint32Array.from([
   1541459225
 ]);
 
-// ../node_modules/@noble/hashes/sha2.js
+// node_modules/@noble/hashes/sha2.js
 var SHA256_K = /* @__PURE__ */ Uint32Array.from([
   1116352408,
   1899447441,
@@ -373,7 +373,7 @@ var sha256 = /* @__PURE__ */ createHasher(
   /* @__PURE__ */ oidNist(1)
 );
 
-// web/shims/crypto.js
+// bench/web/shims/crypto.js
 var hex = (b) => Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
 function createHash(name) {
   if (name !== "sha256") throw new Error("shim: only sha256");
@@ -402,7 +402,7 @@ function createHash(name) {
   };
 }
 
-// ../dist/src/runtime/rng.js
+// dist/src/runtime/rng.js
 function uint64(a) {
   const s = [a.seed, a.modeId, a.nodeId, a.invocation, a.index].map(String).join("");
   const b = createHash("sha256").update(s).digest();
@@ -421,7 +421,7 @@ function weightedIndex(weights, a) {
   throw new Error("unreachable");
 }
 
-// ../dist/src/math/nodeHandlers.js
+// dist/src/math/nodeHandlers.js
 function refs(e, out = /* @__PURE__ */ new Set()) {
   if (!e || typeof e !== "object")
     return out;
@@ -555,7 +555,7 @@ var builtinNodeHandlers = {
   FLOW: { kind: "FLOW", capabilities: (n) => ({ ...base(), mayTransitionMode: n.operation.type === "ENTER_MODE" }), runtime: (c2) => c2.node.operation.type === "END_GAME" ? { terminal: true, payload: "END_GAME" } : { modeId: c2.node.operation.modeId }, exact: (c2) => c2.node.operation.type === "END_GAME" ? { terminal: true } : { modeId: c2.node.operation.modeId, clearFrame: true } }
 };
 
-// ../dist/src/math/evaluators.js
+// dist/src/math/evaluators.js
 function evaluatePaylines(def, board, paytableId, lineIds, wildTag = "WILD") {
   const pt = def.paytables[paytableId], out = [];
   for (const lineId of lineIds) {
@@ -604,7 +604,7 @@ var builtinEvaluatorHandlers = Object.freeze({
   }
 });
 
-// ../dist/src/runtime/executor.js
+// dist/src/runtime/executor.js
 function play(def, seed, opts = {}) {
   let state = { currentModeId: def.entryModeId, totalAward: 0n, values: {}, step: 0n };
   const frame = /* @__PURE__ */ new Map(), trace = [], inv = /* @__PURE__ */ new Map(), handlers = opts.handlers ?? builtinNodeHandlers, evaluators = opts.evaluators ?? builtinEvaluatorHandlers;
@@ -641,27 +641,7 @@ function play(def, seed, opts = {}) {
   throw new Error("execution guard exceeded");
 }
 
-// ../dist/src/math/queryCompiler.js
-function compileMathQuery(query, opts = {}) {
-  switch (query.type) {
-    case "EV":
-    case "RTP":
-      return { queryType: query.type, observables: ["rewardMean"], backend: "REWARD", partitionable: true };
-    case "VARIANCE":
-      return { queryType: query.type, observables: ["rewardSecond"], backend: "REWARD", partitionable: true };
-    case "EXPECTED_DURATION":
-      return { queryType: query.type, observables: ["steps"], backend: "DURATION", partitionable: true };
-    case "HIT_RATE":
-      return { queryType: query.type, observables: ["hitProbability"], backend: "ZERO_WIN", partitionable: true };
-    case "DISTRIBUTION":
-      return { queryType: query.type, observables: opts.pgfZ === void 0 ? [] : ["pgf"], backend: "PGF", partitionable: opts.pgfZ !== void 0, pgfZ: opts.pgfZ };
-    case "FEATURE_FREQUENCY":
-      return { queryType: query.type, observables: [], backend: "ENTRY_PROBABILITY", partitionable: false };
-  }
-  throw new Error(`unregistered query type: ${query.type}`);
-}
-
-// ../dist/src/core/rational.js
+// dist/src/core/rational.js
 var Rational = class _Rational {
   n;
   d;
@@ -707,7 +687,27 @@ function gcd(a, b) {
   return a || 1n;
 }
 
-// ../dist/src/math/exactReels.js
+// dist/src/math/queryCompiler.js
+function compileMathQuery(query, opts = {}) {
+  switch (query.type) {
+    case "EV":
+    case "RTP":
+      return { queryType: query.type, observables: ["rewardMean"], backend: "REWARD", partitionable: true };
+    case "VARIANCE":
+      return { queryType: query.type, observables: ["rewardSecond"], backend: "REWARD", partitionable: true };
+    case "EXPECTED_DURATION":
+      return { queryType: query.type, observables: ["steps"], backend: "DURATION", partitionable: true };
+    case "HIT_RATE":
+      return { queryType: query.type, observables: ["hitProbability"], backend: "ZERO_WIN", partitionable: true };
+    case "DISTRIBUTION":
+      return { queryType: query.type, observables: opts.pgfZ === void 0 ? [] : ["pgf"], backend: "PGF", partitionable: opts.pgfZ !== void 0, pgfZ: opts.pgfZ };
+    case "FEATURE_FREQUENCY":
+      return { queryType: query.type, observables: [], backend: "ENTRY_PROBABILITY", partitionable: false };
+  }
+  throw new Error(`unregistered query type: ${query.type}`);
+}
+
+// dist/src/math/exactReels.js
 var ZERO = new Rational(0n);
 var ONE = new Rational(1n);
 function addTo(m, k, v) {
@@ -998,7 +998,7 @@ function exactSpinPayoutTriggerDistribution(def, reelSetId, paytableId, paylineI
   return [...grouped.values()].sort((a, b) => a.payout < b.payout ? -1 : a.payout > b.payout ? 1 : Number(a.trigger) - Number(b.trigger)).map((x) => ({ payout: x.payout, trigger: x.trigger, probability: new Rational(x.ways, denominator) }));
 }
 
-// ../dist/src/math/markov.js
+// dist/src/math/markov.js
 function solveRegenerative(meanReward, expectedOffspring) {
   if (expectedOffspring.n >= expectedOffspring.d)
     throw new Error(`non-terminating/divergent regenerative process: offspring=${expectedOffspring}`);
@@ -1007,7 +1007,7 @@ function solveRegenerative(meanReward, expectedOffspring) {
   return { expectedVisits: inv, expectedReward: meanReward.mul(inv) };
 }
 
-// ../dist/src/math/invariants.js
+// dist/src/math/invariants.js
 function refs2(e, out = /* @__PURE__ */ new Set()) {
   if ("ref" in e)
     out.add(e.ref);
@@ -1117,7 +1117,7 @@ function hasAdditiveRegenerativeCounter(def, modeId) {
   return terminationUses === 1;
 }
 
-// ../dist/src/math/solverRegistry.js
+// dist/src/math/solverRegistry.js
 var solverCapabilityRegistry = [
   { id: "symbolic-pgf", solver: "HYBRID", exact: true, requirements: ["PGF"], cyclic: true, partitioned: false, priority: 100 },
   { id: "regenerative", solver: "HYBRID", exact: true, requirements: ["REWARD", "DURATION", "ZERO_WIN", "PGF"], cyclic: true, partitioned: false, priority: 90 },
@@ -1172,7 +1172,7 @@ function selectSolverCapability(def, q, registry = solverCapabilityRegistry) {
   return { capability, reason: `${capability.id} satisfies ${q.backend}${cyclic ? " on cyclic graph" : " on acyclic graph"}${regenerative ? " with recognized regenerative quotient" : ""}` };
 }
 
-// ../dist/src/math/planner.js
+// dist/src/math/planner.js
 function exprRefs(e, out = /* @__PURE__ */ new Set()) {
   if ("ref" in e)
     out.add(e.ref);
@@ -1256,7 +1256,7 @@ function planMathQuery(def, query, options = {}) {
   return { query, solver: selected.capability.solver, exact: selected.capability.exact, observables: cq.observables.length ? [...cq.observables] : cq.backend === "PGF" ? ["P(totalAward=x)"] : cq.backend === "ENTRY_PROBABILITY" && query.type === "FEATURE_FREQUENCY" ? [`entered:${query.modeId}`] : [], livePersistentState: [...deps].sort(), syntheticState: syntheticFor(query), reductions, stages, diagnostics, estimatedSourceOutcomes: estimates };
 }
 
-// ../dist/src/math/stateGraph.js
+// dist/src/math/stateGraph.js
 var StateSpaceLimitError = class extends Error {
   limit;
   discovered;
@@ -1317,7 +1317,7 @@ function buildReachableStateGraph(args) {
   return { initialState: initialKey, states };
 }
 
-// ../dist/src/math/capabilities.js
+// dist/src/math/capabilities.js
 function analyzeCapabilities(def, handlers = builtinNodeHandlers) {
   const nodes2 = {}, unsupported = [];
   for (const [mid, m] of Object.entries(def.modes))
@@ -1339,7 +1339,7 @@ function analyzeCapabilities(def, handlers = builtinNodeHandlers) {
   return { nodes: nodes2, exactCompatible: unsupported.length === 0, unsupported };
 }
 
-// ../dist/src/math/lowering.js
+// dist/src/math/lowering.js
 var MAX_RAW_REEL_BOARDS = 2e6;
 var RawReelBoardLimitError = class extends StateSpaceLimitError {
   rawReelBoards = true;
@@ -1396,14 +1396,15 @@ var builtinSourceLowerers = {
 };
 var builtinExactLowering = { sources: builtinSourceLowerers, evaluators: builtinEvaluatorHandlers };
 
-// ../dist/src/math/reelObservableDistribution.js
+// dist/src/math/reelObservableDistribution.js
 function exactReelObservableDistribution(def, reelSetId, rows, descriptors) {
   const reelSet = def.reelSets[reelSetId];
   if (!reelSet)
     throw new Error(`Unknown reel set ${reelSetId}`);
   let frontier = /* @__PURE__ */ new Map();
   const initial = descriptors.map((d) => d.init(def));
-  frontier.set(descriptors.map((d, i) => d.stateKey(initial[i])).join(""), { state: initial, probability: new Rational(1n) });
+  frontier.set(descriptors.map((d, i) => d.stateKey(initial[i])).join(""), { state: initial, weight: 1n });
+  let denominator = 1n;
   for (let column = 0; column < reelSet.reels.length; column++) {
     const strip2 = reelSet.reels[column].symbols;
     const windows = /* @__PURE__ */ new Map();
@@ -1416,17 +1417,18 @@ function exactReelObservableDistribution(def, reelSetId, rows, descriptors) {
       else
         windows.set(key, { visible, count: 1n });
     }
+    denominator *= BigInt(strip2.length);
     const next = /* @__PURE__ */ new Map();
     for (const entry of frontier.values())
       for (const window of windows.values()) {
         const state = descriptors.map((d, i) => d.advance(entry.state[i], window.visible, column, def));
         const key = descriptors.map((d, i) => d.stateKey(state[i])).join("");
-        const p = entry.probability.mul(new Rational(window.count, BigInt(strip2.length)));
+        const w = entry.weight * window.count;
         const old = next.get(key);
         if (old)
-          old.probability = old.probability.add(p);
+          old.weight += w;
         else
-          next.set(key, { state, probability: p });
+          next.set(key, { state, weight: w });
       }
     frontier = next;
   }
@@ -1436,34 +1438,48 @@ function exactReelObservableDistribution(def, reelSetId, rows, descriptors) {
     const key = JSON.stringify(values, (_k, v) => typeof v === "bigint" ? `${v}n` : v);
     const old = atoms.get(key);
     if (old)
-      old.probability = old.probability.add(entry.probability);
+      old.weight += entry.weight;
     else
-      atoms.set(key, { values, probability: entry.probability });
+      atoms.set(key, { values, weight: entry.weight });
   }
-  return [...atoms.values()];
+  return [...atoms.values()].map((a) => ({ values: a.values, probability: new Rational(a.weight, denominator) }));
 }
 
-// ../dist/src/math/sufficientProjection.js
+// dist/src/math/sufficientProjection.js
 function projectByDeterministicContinuation(args) {
   const grouped = /* @__PURE__ */ new Map();
   for (const atom of args.atoms) {
     const s = { modeId: args.boundary.modeId, nodeId: args.continuationNodeId, values: { ...args.boundary.values }, frame: args.inject(atom.value) };
     const r = runDeterministic(args.def, s, args.lowering, args.handlers);
-    const reward = (atom.reward ?? new Rational(0n)).add(r.reward);
-    const key = `${canonicalExecutionState(r.state)}|reward=${reward.toString()}`;
+    const atomReward = atom.reward ?? new Rational(0n), reward = atomReward.add(r.reward);
+    const rewardByMode = { ...r.rewardByMode };
+    if (atomReward.n !== 0n) {
+      if (atomReward.d !== 1n)
+        throw new Error("projection: non-integer atom reward cannot be attributed to a mode");
+      rewardByMode[args.boundary.modeId] = (rewardByMode[args.boundary.modeId] ?? 0n) + atomReward.n;
+    }
+    const visitedModes = [...new Set(r.visitedModes)].sort();
+    const byMode = Object.keys(rewardByMode).sort().map((k) => `${k}=${rewardByMode[k]}`).join(",");
+    const key = `${canonicalExecutionState(r.state)}|reward=${reward.toString()}|visited=${visitedModes.join(",")}|byMode=${byMode}`;
     const old = grouped.get(key);
     if (old)
       old.probability = old.probability.add(atom.probability);
     else
-      grouped.set(key, { representative: atom.value, state: r.state, probability: atom.probability, reward });
+      grouped.set(key, { representative: atom.value, state: r.state, probability: atom.probability, reward, visitedModes, rewardByMode });
   }
   return [...grouped.values()];
 }
 
-// ../dist/src/math/reelObservableRegistry.js
+// dist/src/math/reelObservableRegistry.js
 function lineStateKey(state) {
-  return `${state.target}:${state.first}:${state.count}:${state.alive ? 1 : 0}`;
+  if (!state.alive)
+    return `$${state.paid ?? 0n}`;
+  return state.target ? `${state.target}:${state.count}` : `:${state.first}:${state.count}`;
 }
+var linePay = (pays3, s) => {
+  const target = s.target || s.first;
+  return target ? pays3?.[target]?.[s.count] ?? 0n : 0n;
+};
 var countTagFactory = ({ node, boardAliases }) => {
   if (node?.kind !== "EVALUATE" || node.evaluator?.type !== "COUNT_TAG" || !boardAliases.has(node.evaluator.board))
     return;
@@ -1509,17 +1525,14 @@ var paylinesFactory = ({ node, nodes: nodes2, boardAliases }) => {
           return wild ? { target: "", first, count: state.count + 1, alive: true } : { target: symbol, first, count: state.count + 1, alive: true };
         if (symbol === state.target || wild)
           return { ...state, first, count: state.count + 1 };
-        return { ...state, first, alive: false };
+        return { target: "", first: "", count: 0, alive: false, paid: linePay(game2.paytables[paytableId]?.pays, { ...state, first }) };
       }),
       stateKey: (states) => states.map(lineStateKey).join("|"),
       finish: (states, game2) => {
         const pays3 = game2.paytables[paytableId]?.pays;
         let payout = 0n;
-        for (const state of states) {
-          const target = state.target || state.first;
-          if (target)
-            payout += pays3?.[target]?.[state.count] ?? 0n;
-        }
+        for (const state of states)
+          payout += state.alive ? linePay(pays3, state) : state.paid ?? 0n;
         return payout;
       }
     }
@@ -1534,7 +1547,7 @@ function claimReelObservation(registry, ctx) {
   return type ? registry[type]?.(ctx) : void 0;
 }
 
-// ../dist/src/math/reelDependencyAnalysis.js
+// dist/src/math/reelDependencyAnalysis.js
 function references(value, names) {
   if (typeof value === "string")
     return names.has(value);
@@ -1639,8 +1652,34 @@ function analyzeReelProjectionPlan(def, b, registry = builtinReelObservationRegi
   return { reelSetId: spin2.source.reelSetId, rows: spin2.source.rows, descriptors, rawPayoutOutput, awardMultiplier: multiplier, continuationNodeId: n.id };
 }
 
-// ../dist/src/math/reelOutcomeAggregation.js
+// dist/src/math/reelOutcomeAggregation.js
+var memo = /* @__PURE__ */ new WeakMap();
+function memoFor(...keys) {
+  let m = memo;
+  for (let i = 0; i < 3; i++) {
+    let n = m.get(keys[i]);
+    if (!n) {
+      n = /* @__PURE__ */ new WeakMap();
+      m.set(keys[i], n);
+    }
+    m = n;
+  }
+  let leaf = m.get(keys[3]);
+  if (!leaf) {
+    leaf = /* @__PURE__ */ new Map();
+    m.set(keys[3], leaf);
+  }
+  return leaf;
+}
 function tryExpandAggregatedReelBoundary(def, b, lowering, handlers, observations = builtinReelObservationRegistry()) {
+  const cache3 = memoFor(def, lowering, handlers, observations), key = canonicalExecutionState(b);
+  if (cache3.has(key))
+    return cache3.get(key) ?? void 0;
+  const r = expandUncached(def, b, lowering, handlers, observations);
+  cache3.set(key, r ?? null);
+  return r;
+}
+function expandUncached(def, b, lowering, handlers, observations) {
   const plan2 = analyzeReelProjectionPlan(def, b, observations);
   if (!plan2)
     return;
@@ -1658,10 +1697,10 @@ function tryExpandAggregatedReelBoundary(def, b, lowering, handlers, observation
     })),
     inject: (values) => values
   });
-  return projected.map((x) => ({ state: x.state, probability: x.probability, reward: x.reward }));
+  return projected.map((x) => ({ state: x.state, probability: x.probability, reward: x.reward, visitedModes: x.visitedModes, rewardByMode: x.rewardByMode }));
 }
 
-// ../dist/src/math/eventGraphCompiler.js
+// dist/src/math/eventGraphCompiler.js
 function cloneState(s) {
   return { modeId: s.modeId, nodeId: s.nodeId, values: { ...s.values }, frame: { ...s.frame }, terminal: s.terminal };
 }
@@ -1774,7 +1813,7 @@ function compileEventGraphToStateIR(def, opts = {}) {
   } }), initialReward: start.reward };
 }
 
-// ../dist/src/math/costPlanner.js
+// dist/src/math/costPlanner.js
 var defaultSolverBudget = { maxStates: 1e5, mcSamples: 1e5 };
 function tryCompileStateGraph(def, budget = defaultSolverBudget, deps = {}) {
   try {
@@ -1787,14 +1826,14 @@ function tryCompileStateGraph(def, budget = defaultSolverBudget, deps = {}) {
   }
 }
 
-// ../dist/src/math/executionPlanner.js
+// dist/src/math/executionPlanner.js
 function buildExecutionPlan(def, query, o = {}) {
   const queryIR = o.compiledQuery ?? compileMathQuery(query, { pgfZ: o.pgfZ });
   let math = planMathQuery(def, query, { compiled: queryIR, solverCapabilities: o.solverCapabilities });
   const budget = { maxStates: o.maxStates ?? defaultSolverBudget.maxStates, mcSamples: o.mcSamples ?? defaultSolverBudget.mcSamples };
   if (query.type === "EXPECTED_DURATION" && query.modeId) {
-    const regen2 = hasAdditiveRegenerativeCounter(def, query.modeId);
-    return { math: { ...math, solver: regen2 ? "HYBRID" : "MARKOV", exact: true, diagnostics: [...math.diagnostics, regen2 ? "Mode-specific duration uses the regenerative solver." : "Mode-specific stochastic duration uses an augmented finite state graph."] }, queryIR, budget, decision: { kind: "DIRECT" } };
+    const regen = hasAdditiveRegenerativeCounter(def, query.modeId);
+    return { math: { ...math, solver: regen ? "HYBRID" : "MARKOV", exact: true, diagnostics: [...math.diagnostics, regen ? "Mode-specific duration uses the regenerative solver." : "Mode-specific stochastic duration uses an augmented finite state graph."] }, queryIR, budget, decision: { kind: "DIRECT" } };
   }
   if (math.solver === "MC")
     return { math, queryIR, budget, decision: { kind: "MONTE_CARLO", reason: "selected Monte Carlo solver capability" } };
@@ -1817,7 +1856,7 @@ function buildExecutionPlan(def, query, o = {}) {
   return { math, queryIR, budget, decision: { kind: "MONTE_CARLO", reason: attempt.reason } };
 }
 
-// ../dist/src/math/compiler.js
+// dist/src/math/compiler.js
 function constantBigInt(e) {
   if ("const" in e && (typeof e.const === "bigint" || typeof e.const === "number"))
     return BigInt(e.const);
@@ -1948,7 +1987,7 @@ function compileMomentIR(def) {
   return { ...ev, spins };
 }
 
-// ../dist/src/math/solver.js
+// dist/src/math/solver.js
 function solveExpectedValueIR(ir) {
   const base3 = ir.spins[ir.entryModeId];
   if (!base3)
@@ -1967,7 +2006,7 @@ function solveExpectedValueIR(ir) {
   return { baseEV: base3.expectedReward, featureTriggerProbability: link.triggerProbability, featureEV, expectedFeatureSpins, totalEV: base3.expectedReward.add(link.triggerProbability.mul(featureEV)) };
 }
 
-// ../dist/src/math/moments.js
+// dist/src/math/moments.js
 var ZERO2 = new Rational(0n);
 var ONE2 = new Rational(1n);
 function solveRegenerativeMoments(x) {
@@ -1987,7 +2026,7 @@ function iidSumMoments(one, n) {
   return { mean: mean2, second: second2, variance: second2.sub(mean2.mul(mean2)) };
 }
 
-// ../dist/src/math/momentSolver.js
+// dist/src/math/momentSolver.js
 function solveMomentIR(ir) {
   const base3 = ir.spins[ir.entryModeId];
   if (!base3)
@@ -2009,7 +2048,7 @@ function solveMomentIR(ir) {
   return { mean: mean2, second: second2, variance: second2.sub(mean2.mul(mean2)), featureMean: totalFeature.mean, featureSecond: totalFeature.second };
 }
 
-// ../dist/src/math/hitRate.js
+// dist/src/math/hitRate.js
 function solveExactHitRate(def, tolerance = 1e-15, maxIterations = 1e4) {
   const ir = compileExpectedValueIR(def), link = ir.entryFeature;
   const lineIds = Object.keys(def.paylines);
@@ -2047,7 +2086,7 @@ function solveExactHitRate(def, tolerance = 1e-15, maxIterations = 1e4) {
   return { hitRate: 1 - miss, missRate: miss, featureZeroProbability: featureZero, fixedPointResidual: residual, iterations };
 }
 
-// ../dist/src/math/pgf.js
+// dist/src/math/pgf.js
 var Z = new Rational(0n);
 var O = new Rational(1n);
 function add(m, k, p) {
@@ -2074,11 +2113,11 @@ function compilePaidGamePGF(def) {
   const ir = compileExpectedValueIR(def), base3 = split(modeAtoms(def, def.entryModeId));
   if (!ir.entryFeature)
     return { kind: "PAID_GAME_PGF", baseNonTrigger: base3.no, baseTrigger: base3.yes, initialFeatureSpins: 0n, equation: "G(z)=C(z)+D(z)" };
-  const link = ir.entryFeature, regen2 = ir.regenerativeFeatures[link.toModeId];
-  if (!regen2)
+  const link = ir.entryFeature, regen = ir.regenerativeFeatures[link.toModeId];
+  if (!regen)
     throw new Error("pgf: feature is not regenerative");
   const f = split(modeAtoms(def, link.toModeId));
-  const feature = { kind: "REGENERATIVE_PGF", nonTrigger: f.no, trigger: f.yes, offspringOnTrigger: regen2.retriggerAward, equation: `F(z)=A(z)+B(z)*F(z)^${regen2.retriggerAward}` };
+  const feature = { kind: "REGENERATIVE_PGF", nonTrigger: f.no, trigger: f.yes, offspringOnTrigger: regen.retriggerAward, equation: `F(z)=A(z)+B(z)*F(z)^${regen.retriggerAward}` };
   return { kind: "PAID_GAME_PGF", baseNonTrigger: base3.no, baseTrigger: base3.yes, initialFeatureSpins: link.initialSpins, feature, equation: `G(z)=C(z)+D(z)*F(z)^${link.initialSpins}` };
 }
 function evalPolynomial(p, z) {
@@ -2112,7 +2151,7 @@ function evaluatePaidGamePGF(p, z, tolerance = 1e-14) {
   return { value: c2 + d * Math.pow(f.value, Number(p.initialFeatureSpins)), featureValue: f.value, residual: f.residual };
 }
 
-// ../dist/src/math/finiteMarkov.js
+// dist/src/math/finiteMarkov.js
 function solveLinear(a, b) {
   const n = a.length;
   const m = a.map((row, i) => [...row, b[i]]);
@@ -2173,7 +2212,563 @@ function solveFiniteMarkov(ir) {
   return { initial, byState, transientStates: n, terminalStates: terminals.length };
 }
 
-// ../dist/src/math/observableAlgebra.js
+// dist/src/math/genericRegenerative.js
+function c(e) {
+  return "const" in e && (typeof e.const === "number" || typeof e.const === "bigint") ? BigInt(e.const) : void 0;
+}
+function featureCounter(def, modeId) {
+  const m = def.modes[modeId], adds = Object.values(m.nodes).filter((n) => n.kind === "STATE" && n.op === "ADD" && c(n.value) !== void 0);
+  const dec = adds.find((n) => c(n.value) === -1n);
+  if (!dec)
+    return;
+  const counter = dec.target;
+  for (const n of Object.values(m.nodes))
+    if (n.kind === "STATE" && n.target === counter && n.op === "ADD" && c(n.value) > 0n)
+      return { counter };
+  return { counter };
+}
+function add2(a, b) {
+  return a.add(b);
+}
+var cache = /* @__PURE__ */ new WeakMap();
+function solveGenericRegenerative(def, opts = {}) {
+  const lowering = opts.lowering ?? builtinExactLowering, handlers = opts.handlers ?? builtinNodeHandlers, observations = opts.reelObservations ?? builtinReelObservationRegistry();
+  const cached = cache.get(def)?.get(handlers)?.get(lowering)?.get(observations);
+  if (cached)
+    return cached;
+  const expand2 = (b) => tryExpandAggregatedReelBoundary(def, b, lowering, handlers, observations) ?? expandExactBoundary(def, b, lowering, handlers);
+  const entry = initialExactBoundary(def, lowering, handlers);
+  const base3 = expand2(entry);
+  const featureModes = [...new Set(base3.filter((x) => !x.state.terminal && x.state.modeId !== def.entryModeId).map((x) => x.state.modeId))];
+  if (featureModes.length !== 1)
+    throw new Error(`generic regenerative solver expected one entered feature mode, got ${featureModes.length}`);
+  const fm = featureModes[0], inv = featureCounter(def, fm);
+  if (!inv)
+    throw new Error(`generic regenerative solver: no additive work counter in ${fm}`);
+  const fs0 = runDeterministic(def, { modeId: fm, nodeId: def.modes[fm].entryNodeId, values: { [inv.counter]: 1 }, frame: {} }, lowering, handlers).state;
+  const fo = expand2(fs0);
+  let er = new Rational(0n), er2 = new Rational(0n), ek = new Rational(0n), ekk1 = new Rational(0n), erk = new Rational(0n), q0 = new Rational(0n);
+  const one = new Rational(1n);
+  for (const o of fo) {
+    const r = o.reward, k = o.state.terminal ? 0n : BigInt(o.state.values[inv.counter] ?? 0);
+    er = add2(er, o.probability.mul(r));
+    er2 = add2(er2, o.probability.mul(r.mul(r)));
+    ek = add2(ek, o.probability.mul(new Rational(k)));
+    ekk1 = add2(ekk1, o.probability.mul(new Rational(k * (k - 1n))));
+    erk = add2(erk, o.probability.mul(r.mul(new Rational(k))));
+    if (r.n === 0n && k === 0n)
+      q0 = add2(q0, o.probability);
+  }
+  const denom = one.sub(ek);
+  if (denom.n <= 0n)
+    throw new Error("generic regenerative solver: non-terminating feature (E[K] >= 1)");
+  const fm1 = er.div(denom);
+  const fm2 = er2.add(new Rational(2n).mul(erk).mul(fm1)).add(ekk1.mul(fm1.mul(fm1))).div(denom);
+  let z = 0;
+  for (let it = 0; it < 1e4; it++) {
+    let nz = 0;
+    for (const o of fo) {
+      if (o.reward.n !== 0n)
+        continue;
+      const k = o.state.terminal ? 0 : Number(BigInt(o.state.values[inv.counter] ?? 0));
+      nz += o.probability.toNumber() * Math.pow(z, k);
+    }
+    if (Math.abs(nz - z) < 1e-15) {
+      z = nz;
+      break;
+    }
+    z = nz;
+  }
+  const zRat = new Rational(BigInt(Math.round(z * 1e15)), 1000000000000000n);
+  let mean2 = new Rational(0n), second2 = new Rational(0n), miss = new Rational(0n), pfeat = new Rational(0n), paidSpins = new Rational(0n);
+  let conditionalSpins = new Rational(0n);
+  for (const o of base3) {
+    const p = o.probability, r = o.reward;
+    if (o.state.terminal) {
+      mean2 = add2(mean2, p.mul(r));
+      second2 = add2(second2, p.mul(r.mul(r)));
+      if (r.n === 0n)
+        miss = add2(miss, p);
+      continue;
+    }
+    if (o.state.modeId !== fm)
+      throw new Error(`unexpected continuation mode ${o.state.modeId}`);
+    const n = BigInt(o.state.values[inv.counter] ?? 0);
+    pfeat = add2(pfeat, p);
+    const nr = new Rational(n), fmean = fm1.mul(nr), fsecond = fm2.mul(nr).add(fm1.mul(fm1).mul(new Rational(n * (n - 1n))));
+    mean2 = add2(mean2, p.mul(r.add(fmean)));
+    second2 = add2(second2, p.mul(r.mul(r).add(new Rational(2n).mul(r).mul(fmean)).add(fsecond)));
+    const visits = nr.div(denom);
+    paidSpins = add2(paidSpins, p.mul(visits));
+    conditionalSpins = add2(conditionalSpins, p.mul(visits));
+    if (r.n === 0n)
+      miss = add2(miss, p.mul(new Rational(zRat.n ** n, zRat.d ** n)));
+  }
+  const result = { featureModeId: fm, mean: mean2, second: second2, variance: second2.sub(mean2.mul(mean2)), hitRate: one.sub(miss), featureTriggerProbability: pfeat, expectedFeatureSpins: pfeat.n === 0n ? new Rational(0n) : conditionalSpins.div(pfeat), expectedPaidGameFeatureSpins: paidSpins, featureMean: fm1, featureSecond: fm2 };
+  let a = cache.get(def);
+  if (!a) {
+    a = /* @__PURE__ */ new WeakMap();
+    cache.set(def, a);
+  }
+  let bb = a.get(handlers);
+  if (!bb) {
+    bb = /* @__PURE__ */ new WeakMap();
+    a.set(handlers, bb);
+  }
+  let cc = bb.get(lowering);
+  if (!cc) {
+    cc = /* @__PURE__ */ new WeakMap();
+    bb.set(lowering, cc);
+  }
+  cc.set(observations, result);
+  return result;
+}
+
+// dist/src/math/modeStatistics.js
+function boundaryExpander(def, lowering, handlers, obs) {
+  return (b) => tryExpandAggregatedReelBoundary(def, b, lowering, handlers, obs) ?? expandExactBoundary(def, b, lowering, handlers);
+}
+function solveModeStatistics(def, modeId, opts = {}) {
+  if (!def.modes[modeId])
+    throw new Error(`unknown mode ${modeId}`);
+  const handlers = opts.handlers ?? builtinNodeHandlers, lowering = opts.lowering ?? builtinExactLowering, expand2 = boundaryExpander(def, lowering, handlers, opts.reelObservations ?? builtinReelObservationRegistry());
+  const capabilities = analyzeCapabilities(def, handlers);
+  if (!capabilities.exactCompatible)
+    throw new Error(`definition is not exact-compatible: ${capabilities.unsupported.join("; ")}`);
+  const start = runDeterministic(def, { modeId: def.entryModeId, nodeId: def.modes[def.entryModeId].entryNodeId, values: {}, frame: {} }, lowering, handlers);
+  const initial = { execution: start.state, visited: start.visitedModes.includes(modeId) };
+  const graph = (metric) => buildReachableStateGraph({
+    initial,
+    maxStates: opts.maxStates,
+    canonicalize: (s) => `${s.visited ? 1 : 0}:${canonicalExecutionState(s.execution)}`,
+    isTerminal: (s) => !!s.execution.terminal,
+    expand: (s) => expand2(s.execution).map((o) => {
+      const visited = s.visited || o.visitedModes.includes(modeId);
+      return { state: { execution: o.state, visited }, probability: o.probability, reward: new Rational(metric === "entry" ? !s.visited && visited ? 1n : 0n : s.execution.modeId === modeId ? 1n : 0n) };
+    })
+  });
+  const probability = initial.visited ? new Rational(1n) : solveFiniteMarkov(graph("entry")).initial.expectedReward;
+  const expectedSteps = solveFiniteMarkov(graph("steps")).initial.expectedReward;
+  return { modeId, probability, expectedSteps, expectedStepsWhenEntered: probability.n === 0n ? new Rational(0n) : expectedSteps.div(probability) };
+}
+function solveModeReward(def, modeId, opts = {}) {
+  const handlers = opts.handlers ?? builtinNodeHandlers, lowering = opts.lowering ?? builtinExactLowering, expand2 = boundaryExpander(def, lowering, handlers, opts.reelObservations ?? builtinReelObservationRegistry());
+  const start = runDeterministic(def, { modeId: def.entryModeId, nodeId: def.modes[def.entryModeId].entryNodeId, values: {}, frame: {} }, lowering, handlers);
+  const graph = buildReachableStateGraph({
+    initial: start.state,
+    maxStates: opts.maxStates,
+    canonicalize: canonicalExecutionState,
+    isTerminal: (s) => !!s.terminal,
+    expand: (s) => expand2(s).map((o) => ({ state: o.state, probability: o.probability, reward: new Rational(o.rewardByMode[modeId] ?? 0n) }))
+  });
+  return solveFiniteMarkov(graph).initial.expectedReward.add(new Rational(start.rewardByMode[modeId] ?? 0n));
+}
+
+// dist/src/math/statePGF.js
+function compileStatePGF(graph) {
+  for (const state of Object.values(graph.states))
+    for (const t of state.transitions) {
+      if (!t.rewardAtoms)
+        throw new Error("state PGF requires individual reward atoms");
+      for (const a of t.rewardAtoms)
+        if (a.reward.n < 0n || a.reward.d !== 1n)
+          throw new Error("state PGF requires non-negative integer rewards");
+    }
+  const r = graph.initialReward;
+  if (r && (r.n < 0n || r.d !== 1n))
+    throw new Error("state PGF requires non-negative integer rewards");
+  return { kind: "STATE_GRAPH_PGF", equation: "F_s(z) = sum p(s,t,r) z^r F_t(z); F_terminal(z) = 1", graph };
+}
+function evaluateStatePGF(p, z) {
+  if (!Number.isFinite(z) || z < 0 || z > 1)
+    throw new Error("PGF evaluation requires 0<=z<=1");
+  const graph = p.graph, states = Object.values(graph.states).filter((s) => !s.terminal), index = new Map(states.map((s, i) => [s.key, i]));
+  const n = states.length, A = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_2, j) => i === j ? 1 : 0)), b = Array(n).fill(0);
+  for (let i = 0; i < n; i++)
+    for (const t of states[i].transitions)
+      for (const atom of t.rewardAtoms) {
+        const weight = t.probability.toNumber() * atom.probability.toNumber() * Math.pow(z, Number(atom.reward.n)), j = index.get(t.to);
+        if (j === void 0) {
+          if (!graph.states[t.to]?.terminal)
+            throw new Error(`missing state ${t.to}`);
+          b[i] += weight;
+        } else
+          A[i][j] -= weight;
+      }
+  const original = A.map((row, i) => [...row, b[i]]), m = original.map((row) => [...row]);
+  for (let col = 0; col < n; col++) {
+    let pivot = col;
+    while (pivot < n && Math.abs(m[pivot][col]) < 1e-14)
+      pivot++;
+    if (pivot === n)
+      throw new Error("singular state PGF system: model may be non-terminating");
+    [m[col], m[pivot]] = [m[pivot], m[col]];
+    const d = m[col][col];
+    for (let j = col; j <= n; j++)
+      m[col][j] /= d;
+    for (let i = 0; i < n; i++)
+      if (i !== col) {
+        const f = m[i][col];
+        for (let j = col; j <= n; j++)
+          m[i][j] -= f * m[col][j];
+      }
+  }
+  const x = m.map((row) => row[n]);
+  let residual = 0;
+  for (let i = 0; i < n; i++)
+    residual = Math.max(residual, Math.abs(original[i].slice(0, n).reduce((s, a, j) => s + a * x[j], 0) - original[i][n]));
+  const initial = index.get(graph.initialState), value = (initial === void 0 ? 1 : x[initial]) * Math.pow(z, Number(graph.initialReward?.n ?? 0n));
+  return { value, residual };
+}
+
+// dist/src/math/primitives/kernels.js
+function stripFreq(strip2) {
+  const m = /* @__PURE__ */ new Map();
+  for (const x of strip2)
+    m.set(x, (m.get(x) ?? 0n) + 1n);
+  return [...m];
+}
+var stopSpace = (reels) => reels.reduce((a, s) => a * BigInt(s.length), 1n);
+function maskedLinePayNumerator(def, S, reels, mask = 0, wild, cache3 = /* @__PURE__ */ new Map()) {
+  const freq = reels.map(stripFreq);
+  const one = { ...def, paylines: { "@L": { id: "@L", rows: Array(S.cols).fill(0) } } };
+  let tot = 0n;
+  for (const id of S.lineIds) {
+    const rows = mask ? def.paylines[id].rows : Array(S.cols).fill(0);
+    const stuck = rows.map((r, c2) => mask >> r * S.cols + c2 & 1).join("");
+    let v = cache3.get(stuck);
+    if (v === void 0) {
+      let acc = 0n;
+      const seq = [];
+      const go = (c2, w) => {
+        if (c2 === S.cols) {
+          const p = evaluatePaylines(one, { rows: 1, cols: S.cols, stops: Array(S.cols).fill(0), symbols: [seq] }, S.paytableId, ["@L"], S.wildTag).reduce((a, x) => a + x.payout, 0n);
+          acc += p * w;
+          return;
+        }
+        if (stuck[c2] === "1") {
+          seq[c2] = wild;
+          go(c2 + 1, w * BigInt(reels[c2].length));
+          return;
+        }
+        for (const [x, k] of freq[c2]) {
+          seq[c2] = x;
+          go(c2 + 1, w * k);
+        }
+      };
+      go(0, 1n);
+      v = acc;
+      cache3.set(stuck, v);
+    }
+    tot += v;
+  }
+  return tot;
+}
+function maskUpdateColumn(strip2, rows, prior, lock, value = () => 0) {
+  const m = /* @__PURE__ */ new Map(), L = strip2.length;
+  for (let st = 0; st < L; st++) {
+    let q = prior, v = 0;
+    for (let r = 0; r < rows; r++) {
+      if (prior >> r & 1)
+        continue;
+      const s = strip2[(st + r) % L];
+      if (lock(s)) {
+        q |= 1 << r;
+        v += value(s);
+      }
+    }
+    const e = m.get(q) ?? [0, 0];
+    e[0]++;
+    e[1] += v;
+    m.set(q, e);
+  }
+  return [...m].map(([q, [n, v]]) => [q, n, v]);
+}
+var columnToMask = (c2, p, rows, cols) => {
+  let m = 0;
+  for (let r = 0; r < rows; r++)
+    if (p >> r & 1)
+      m |= 1 << r * cols + c2;
+  return m;
+};
+var popcount = (m) => {
+  let n = 0;
+  while (m) {
+    m &= m - 1;
+    n++;
+  }
+  return n;
+};
+function tagCountDistribution(reels, rows, tagged) {
+  let dist = [1n];
+  for (const st of reels) {
+    const cnt = [];
+    for (let s = 0; s < st.length; s++) {
+      let n = 0;
+      for (let r = 0; r < rows; r++)
+        if (tagged(st[(s + r) % st.length]))
+          n++;
+      cnt[n] = (cnt[n] ?? 0n) + 1n;
+    }
+    const nd = [];
+    dist.forEach((a, i) => cnt.forEach((b, j) => {
+      if (b)
+        nd[i + j] = (nd[i + j] ?? 0n) + a * (b ?? 0n);
+    }));
+    dist = nd;
+  }
+  return dist;
+}
+function respinResetGeometric(q, R2) {
+  let g = 0, qq = 1;
+  for (let i = 0; i < R2; i++) {
+    g += qq;
+    qq *= q;
+  }
+  return g;
+}
+var ladderMultiplier = (ladder, t) => ladder[Math.min(t, ladder.length - 1)];
+function boardOps(T) {
+  const { rows: R2, cols: C, lines, pay, wild: W } = T, P = C + 1, NL = lines.length;
+  const strips = T.strips.map((s) => Int16Array.from(s)), LEN = strips.map((s) => s.length);
+  const LR = Int8Array.from(lines.flat());
+  const board = new Int16Array(R2 * C), stops = new Int32Array(C), hitCnt = new Int8Array(NL), tmp = new Int16Array(R2);
+  const spin2 = (s) => {
+    for (let c2 = 0; c2 < C; c2++) {
+      stops[c2] = s[c2];
+      for (let r = 0; r < R2; r++)
+        board[r * C + c2] = strips[c2][(s[c2] + r) % LEN[c2]];
+    }
+  };
+  const winCells = () => {
+    let win = 0;
+    for (let l = 0; l < NL; l++) {
+      const o = l * C;
+      let t = -1;
+      for (let c2 = 0; c2 < C; c2++) {
+        const s = board[LR[o + c2] * C + c2];
+        if (s !== W) {
+          t = s;
+          break;
+        }
+      }
+      if (t < 0)
+        t = W;
+      let n = 0;
+      for (; n < C; n++) {
+        const s = board[LR[o + n] * C + n];
+        if (s !== t && s !== W)
+          break;
+      }
+      const p = pay[t * P + n];
+      hitCnt[l] = p > 0 ? n : 0;
+      win += p;
+    }
+    return win;
+  };
+  const dynamicsRefill = () => {
+    for (let c2 = 0; c2 < C; c2++) {
+      let mask = 0;
+      for (let l = 0; l < NL; l++)
+        if (hitCnt[l] > c2)
+          mask |= 1 << LR[l * C + c2];
+      if (!mask)
+        continue;
+      let k = 0, rem = 0;
+      for (let r = 0; r < R2; r++)
+        if (mask & 1 << r)
+          rem++;
+        else
+          tmp[k++] = board[r * C + c2];
+      const L = LEN[c2], st = ((stops[c2] - rem) % L + L) % L;
+      stops[c2] = st;
+      for (let i = 0; i < rem; i++)
+        board[i * C + c2] = strips[c2][(st + i) % L];
+      for (let i = 0; i < k; i++)
+        board[(rem + i) * C + c2] = tmp[i];
+    }
+  };
+  return { spin: spin2, winCells, dynamicsRefill, strips, LEN, LR, NL, P };
+}
+var columnEV = (def) => solveExpectedValueIR(compileExpectedValueIR(def));
+var columnMoments = (def) => solveMomentIR(compileMomentIR(def));
+var columnHitRate = (def, o = {}) => solveExactHitRate(def, o.tolerance ?? 1e-15, o.maxIterations ?? 1e4);
+var columnPGF = (def) => compilePaidGamePGF(def);
+var columnPGFAt = (pgf2, z, tol = 1e-14) => evaluatePaidGamePGF(pgf2, z, tol);
+var columnEVIR = (def) => compileExpectedValueIR(def);
+var graphSolve = (g) => solveFiniteMarkov(g);
+var graphPGF = (g) => compileStatePGF(g);
+var graphPGFAt = (p, z) => evaluateStatePGF(p, z);
+var modeStatistics = (def, modeId, o = {}) => solveModeStatistics(def, modeId, { maxStates: o.maxStates, handlers: o.handlers, lowering: o.lowering, reelObservations: o.reelObservations });
+var modeReward = (def, modeId, o = {}) => solveModeReward(def, modeId, { maxStates: o.maxStates, handlers: o.handlers, lowering: o.lowering, reelObservations: o.reelObservations });
+var renewal = (decrement, retriggerMass) => solveRegenerative(decrement, retriggerMass);
+var regenerativeSolve = (def, o = {}) => solveGenericRegenerative(def, { lowering: o.lowering, handlers: o.handlers, reelObservations: o.reelObservations });
+function composeRegen(baseEV, triggerProbability, featureEVGivenTrigger) {
+  const featureEV = triggerProbability.mul(featureEVGivenTrigger);
+  return { ev: baseEV.add(featureEV), featureEV };
+}
+
+// dist/src/math/primitives/folds/graphExact.js
+function graphEV(def, g, o = {}) {
+  const x = graphSolve(g), modes = Object.keys(def.modes).filter((id) => id !== def.entryModeId);
+  const mode = modes.length === 1 ? modeStatistics(def, modes[0], o) : void 0;
+  const baseEV = modes.length ? modeReward(def, def.entryModeId, o) : x.initial.expectedReward;
+  const featureEV = mode ? mode.probability.n === 0n ? new Rational(0n) : modeReward(def, modes[0], o).div(mode.probability) : modes.length ? null : new Rational(0n);
+  return { ev: x.initial.expectedReward, baseEV, featureEV, featureTriggerProbability: mode?.probability ?? (modes.length ? null : new Rational(0n)), expectedFeatureSpins: mode?.expectedStepsWhenEntered ?? (modes.length ? null : new Rational(0n)) };
+}
+function graphDuration(g) {
+  const x = graphSolve(g);
+  return { expectedFeatureSpins: x.initial.expectedSteps, expectedPaidGameFeatureSpins: x.initial.expectedSteps };
+}
+function graphHitRate(g) {
+  const x = graphPGFAt(graphPGF(g), 0);
+  return { hitRate: 1 - x.value, missRate: x.value, featureZeroProbability: NaN, fixedPointResidual: x.residual, iterations: 0 };
+}
+function graphVariance(g) {
+  const x = graphSolve(g);
+  return { mean: x.initial.expectedReward, secondMoment: x.initial.rewardSecond, variance: x.initial.rewardVariance, featureMean: new Rational(0n), featureSecondMoment: new Rational(0n) };
+}
+function graphDistribution(g, z) {
+  const pgf2 = graphPGF(g);
+  return { pgf: pgf2, evaluation: z === void 0 ? void 0 : { z, ...graphPGFAt(pgf2, z) } };
+}
+
+// dist/src/math/primitives/folds/columnDP.js
+function columnDPEV(def, g, o = {}) {
+  if (g)
+    return graphEV(def, g, o);
+  const x = columnEV(def);
+  return { ev: x.totalEV, baseEV: x.baseEV, featureEV: x.featureEV, featureTriggerProbability: x.featureTriggerProbability, expectedFeatureSpins: x.expectedFeatureSpins };
+}
+function columnDPDuration(def, g) {
+  if (g)
+    return graphDuration(g);
+  const ir = columnEVIR(def), link = ir.entryFeature;
+  if (!link)
+    return { expectedFeatureSpins: new Rational(0n), expectedPaidGameFeatureSpins: new Rational(0n) };
+  const f = ir.regenerativeFeatures[link.toModeId];
+  if (!f)
+    throw new Error(`duration: feature ${link.toModeId} is not regenerative`);
+  if (f.decrement !== 1n)
+    throw new Error(`duration: unsupported decrement ${f.decrement}`);
+  const one = renewal(new Rational(1n), f.spin.triggerProbability.mul(new Rational(f.retriggerAward)));
+  const conditional = one.expectedVisits.mul(new Rational(link.initialSpins));
+  return { expectedFeatureSpins: conditional, expectedPaidGameFeatureSpins: link.triggerProbability.mul(conditional) };
+}
+function columnDPHitRate(def, g, o = {}) {
+  return g ? graphHitRate(g) : columnHitRate(def, o);
+}
+function columnDPVariance(def, g) {
+  if (g)
+    return graphVariance(g);
+  const x = columnMoments(def);
+  return { mean: x.mean, secondMoment: x.second, variance: x.variance, featureMean: x.featureMean, featureSecondMoment: x.featureSecond };
+}
+function columnDPDistribution(def, g, z, tol) {
+  if (g)
+    return graphDistribution(g, z);
+  const pgf2 = columnPGF(def);
+  return { pgf: pgf2, evaluation: z === void 0 ? void 0 : { z, ...columnPGFAt(pgf2, z, tol ?? 1e-14) } };
+}
+
+// dist/src/math/primitives/folds/regen.js
+var hasRegenCounter = (def) => Object.keys(def.modes).some((id) => hasAdditiveRegenerativeCounter(def, id));
+function regenEV(def, o = {}) {
+  const g = regenerativeSolve(def, o);
+  return { ev: g.mean, baseEV: g.mean.sub(g.featureTriggerProbability.mul(g.featureMean)), featureEV: g.featureMean, featureTriggerProbability: g.featureTriggerProbability, expectedFeatureSpins: g.expectedFeatureSpins };
+}
+function regenDuration(def, o = {}) {
+  const g = regenerativeSolve(def, o);
+  return { expectedFeatureSpins: g.expectedFeatureSpins, expectedPaidGameFeatureSpins: g.expectedPaidGameFeatureSpins };
+}
+function regenHitRate(def, o = {}) {
+  const g = regenerativeSolve(def, o);
+  return { hitRate: g.hitRate.toNumber(), missRate: 1 - g.hitRate.toNumber(), featureZeroProbability: NaN, fixedPointResidual: 0, iterations: 0 };
+}
+function regenVariance(def, o = {}) {
+  const g = regenerativeSolve(def, o);
+  return { mean: g.mean, secondMoment: g.second, variance: g.variance, featureMean: g.featureMean, featureSecondMoment: g.featureSecond };
+}
+function regenModeDuration(def, modeId, o = {}) {
+  if (hasRegenCounter(def)) {
+    const g = regenerativeSolve(def, o);
+    if (g.featureModeId === modeId)
+      return { expectedFeatureSpins: g.expectedFeatureSpins, expectedPaidGameFeatureSpins: g.expectedPaidGameFeatureSpins };
+  }
+  const s = modeStatistics(def, modeId, o);
+  return { expectedFeatureSpins: s.expectedStepsWhenEntered, expectedPaidGameFeatureSpins: s.expectedSteps };
+}
+function regenFeatureFrequency(def, modeId, useRegen, o = {}) {
+  if (!def.modes[modeId])
+    throw new Error(`feature frequency: unknown mode ${modeId}`);
+  if (modeId === def.entryModeId)
+    return { modeId, probability: new Rational(1n) };
+  if (useRegen) {
+    const g = regenerativeSolve(def, o);
+    if (modeId !== g.featureModeId)
+      throw new Error(`feature frequency: mode ${modeId} is not a directly supported entry feature`);
+    return { modeId, probability: g.featureTriggerProbability };
+  }
+  return { modeId, probability: modeStatistics(def, modeId, o).probability };
+}
+
+// dist/src/math/primitives/exactFolds.js
+var isRegen = (e) => e.math.reductions.some((x) => x.kind === "ADDITIVE_REGENERATIVE_COUNTER");
+var hasReels = (def) => Object.values(def.modes).some((m) => Object.values(m.nodes).some((n) => n.kind === "SOURCE" && n.source?.type === "REEL_SPIN"));
+var graphOf = (e) => e.decision.kind === "STATE_EXACT" ? e.decision.graph : void 0;
+function wager(def, explicit) {
+  const b = explicit ?? def.wager?.totalBet;
+  if (b === void 0)
+    throw new Error("RTP requires query.bet or GameDefinition.wager");
+  if (b <= 0n)
+    throw new Error("RTP bet must be positive");
+  return b;
+}
+function genericFoldKind(def, e) {
+  return isRegen(e) ? "regen" : hasReels(def) ? "columnDP" : "graphExact";
+}
+function genericFoldPlan(def, e) {
+  const k = genericFoldKind(def, e);
+  if (k === "graphExact")
+    return { kind: "graphExact" };
+  if (k === "regen" || Object.keys(def.modes).length > 1 || e.math.solver === "REGENERATIVE")
+    return { kind: "regen", inner: { kind: "columnDP", observe: [] }, buyOnly: false, retrigger: false };
+  return { kind: "columnDP", observe: [] };
+}
+function foldEV({ def, execution, options }) {
+  if (isRegen(execution))
+    return regenEV(def, options);
+  const g = graphOf(execution);
+  return genericFoldKind(def, execution) === "graphExact" && g ? graphEV(def, g, options) : columnDPEV(def, g, options);
+}
+var exactFoldExecutors = {
+  EV: (ctx) => foldEV(ctx),
+  RTP: (ctx) => {
+    const q = ctx.query;
+    if (q.type !== "RTP")
+      throw new Error("RTP projector mismatch");
+    const bet = wager(ctx.def, q.bet), x = foldEV(ctx);
+    return { ...x, bet, rtp: x.ev.div(new Rational(bet)) };
+  },
+  EXPECTED_DURATION: ({ def, query, execution, options }) => {
+    if (query.type === "EXPECTED_DURATION" && query.modeId)
+      return regenModeDuration(def, query.modeId, options);
+    return isRegen(execution) ? regenDuration(def, options) : columnDPDuration(def, graphOf(execution));
+  },
+  FEATURE_FREQUENCY: ({ def, query, execution, options }) => {
+    if (query.type !== "FEATURE_FREQUENCY")
+      throw new Error("feature-frequency projector mismatch");
+    return regenFeatureFrequency(def, query.modeId, isRegen(execution) || hasRegenCounter(def), options);
+  },
+  HIT_RATE: ({ def, execution, options }) => isRegen(execution) ? regenHitRate(def, options) : columnDPHitRate(def, graphOf(execution), options),
+  VARIANCE: ({ def, execution, options }) => isRegen(execution) ? regenVariance(def, options) : columnDPVariance(def, graphOf(execution)),
+  DISTRIBUTION: ({ def, execution, options }) => columnDPDistribution(def, graphOf(execution), options.pgfZ, options.tolerance)
+};
+function runExactFold(ctx) {
+  return exactFoldExecutors[ctx.query.type](ctx);
+}
+
+// dist/src/math/observableAlgebra.js
 var mean = { name: "rewardMean", dependsOn: [], immediate: (c2) => c2.reward, continuationCoefficient: () => 1, cutContribution: (c2) => c2.cut?.rewardMean ?? 0 };
 var second = { name: "rewardSecond", dependsOn: ["rewardMean"], immediate: (c2) => c2.reward * c2.reward + 2 * c2.reward * (c2.future.rewardMean ?? c2.cut?.rewardMean ?? 0), continuationCoefficient: () => 1, cutContribution: (c2) => c2.cut?.rewardSecond ?? 0 };
 var steps = { name: "steps", dependsOn: [], immediate: () => 1, continuationCoefficient: () => 1, cutContribution: (c2) => c2.cut?.steps ?? 0 };
@@ -2208,7 +2803,7 @@ function observableAlgebra(names, extensions = {}) {
 }
 var fullBoundaryAlgebra = observableAlgebra(["rewardMean", "rewardSecond", "steps", "hitProbability", "pgf"]);
 
-// ../dist/src/math/hybrid.js
+// dist/src/math/hybrid.js
 function u01(seed, sample, step) {
   const b = createHash("sha256").update(`${seed}${sample}${step}`).digest();
   const x = b.readBigUInt64BE(0) >> 11n;
@@ -2333,7 +2928,7 @@ function solveHybridObservables(def, opts) {
   return solveHybridAlgebra(def, { ...opts, algebra: observableAlgebra(names, opts.observableComponents) });
 }
 
-// ../dist/src/math/monteCarlo.js
+// dist/src/math/monteCarlo.js
 function deriveSeed(master, index) {
   const b = createHash("sha256").update(`${master}${index}`).digest();
   return b.readBigUInt64BE(0);
@@ -2373,217 +2968,8 @@ function simulate(def, samples, masterSeed = 1n, handlers, evaluators) {
   return { samples, mean: mean2, variance: sum2 / samples - mean2 * mean2, hitRate: hits / samples, featureRate: features / samples, averageFeatureSpins: features ? featureSpins / features : 0, modes };
 }
 
-// ../dist/src/math/genericRegenerative.js
-function c(e) {
-  return "const" in e && (typeof e.const === "number" || typeof e.const === "bigint") ? BigInt(e.const) : void 0;
-}
-function featureCounter(def, modeId) {
-  const m = def.modes[modeId], adds = Object.values(m.nodes).filter((n) => n.kind === "STATE" && n.op === "ADD" && c(n.value) !== void 0);
-  const dec = adds.find((n) => c(n.value) === -1n);
-  if (!dec)
-    return;
-  const counter = dec.target;
-  for (const n of Object.values(m.nodes))
-    if (n.kind === "STATE" && n.target === counter && n.op === "ADD" && c(n.value) > 0n)
-      return { counter };
-  return { counter };
-}
-function add2(a, b) {
-  return a.add(b);
-}
-var cache = /* @__PURE__ */ new WeakMap();
-function solveGenericRegenerative(def, opts = {}) {
-  const lowering = opts.lowering ?? builtinExactLowering, handlers = opts.handlers ?? builtinNodeHandlers, observations = opts.reelObservations ?? builtinReelObservationRegistry();
-  const cached = cache.get(def)?.get(handlers)?.get(lowering)?.get(observations);
-  if (cached)
-    return cached;
-  const expand2 = (b) => tryExpandAggregatedReelBoundary(def, b, lowering, handlers, observations) ?? expandExactBoundary(def, b, lowering, handlers);
-  const entry = initialExactBoundary(def, lowering, handlers);
-  const base3 = expand2(entry);
-  const featureModes = [...new Set(base3.filter((x) => !x.state.terminal && x.state.modeId !== def.entryModeId).map((x) => x.state.modeId))];
-  if (featureModes.length !== 1)
-    throw new Error(`generic regenerative solver expected one entered feature mode, got ${featureModes.length}`);
-  const fm = featureModes[0], inv = featureCounter(def, fm);
-  if (!inv)
-    throw new Error(`generic regenerative solver: no additive work counter in ${fm}`);
-  const fs0 = runDeterministic(def, { modeId: fm, nodeId: def.modes[fm].entryNodeId, values: { [inv.counter]: 1 }, frame: {} }, lowering, handlers).state;
-  const fo = expand2(fs0);
-  let er = new Rational(0n), er2 = new Rational(0n), ek = new Rational(0n), ekk1 = new Rational(0n), erk = new Rational(0n), q0 = new Rational(0n);
-  const one = new Rational(1n);
-  for (const o of fo) {
-    const r = o.reward, k = o.state.terminal ? 0n : BigInt(o.state.values[inv.counter] ?? 0);
-    er = add2(er, o.probability.mul(r));
-    er2 = add2(er2, o.probability.mul(r.mul(r)));
-    ek = add2(ek, o.probability.mul(new Rational(k)));
-    ekk1 = add2(ekk1, o.probability.mul(new Rational(k * (k - 1n))));
-    erk = add2(erk, o.probability.mul(r.mul(new Rational(k))));
-    if (r.n === 0n && k === 0n)
-      q0 = add2(q0, o.probability);
-  }
-  const denom = one.sub(ek);
-  if (denom.n <= 0n)
-    throw new Error("generic regenerative solver: non-terminating feature (E[K] >= 1)");
-  const fm1 = er.div(denom);
-  const fm2 = er2.add(new Rational(2n).mul(erk).mul(fm1)).add(ekk1.mul(fm1.mul(fm1))).div(denom);
-  let z = 0;
-  for (let it = 0; it < 1e4; it++) {
-    let nz = 0;
-    for (const o of fo) {
-      if (o.reward.n !== 0n)
-        continue;
-      const k = o.state.terminal ? 0 : Number(BigInt(o.state.values[inv.counter] ?? 0));
-      nz += o.probability.toNumber() * Math.pow(z, k);
-    }
-    if (Math.abs(nz - z) < 1e-15) {
-      z = nz;
-      break;
-    }
-    z = nz;
-  }
-  const zRat = new Rational(BigInt(Math.round(z * 1e15)), 1000000000000000n);
-  let mean2 = new Rational(0n), second2 = new Rational(0n), miss = new Rational(0n), pfeat = new Rational(0n), paidSpins = new Rational(0n);
-  let conditionalSpins = new Rational(0n);
-  for (const o of base3) {
-    const p = o.probability, r = o.reward;
-    if (o.state.terminal) {
-      mean2 = add2(mean2, p.mul(r));
-      second2 = add2(second2, p.mul(r.mul(r)));
-      if (r.n === 0n)
-        miss = add2(miss, p);
-      continue;
-    }
-    if (o.state.modeId !== fm)
-      throw new Error(`unexpected continuation mode ${o.state.modeId}`);
-    const n = BigInt(o.state.values[inv.counter] ?? 0);
-    pfeat = add2(pfeat, p);
-    const nr = new Rational(n), fmean = fm1.mul(nr), fsecond = fm2.mul(nr).add(fm1.mul(fm1).mul(new Rational(n * (n - 1n))));
-    mean2 = add2(mean2, p.mul(r.add(fmean)));
-    second2 = add2(second2, p.mul(r.mul(r).add(new Rational(2n).mul(r).mul(fmean)).add(fsecond)));
-    const visits = nr.div(denom);
-    paidSpins = add2(paidSpins, p.mul(visits));
-    conditionalSpins = add2(conditionalSpins, p.mul(visits));
-    if (r.n === 0n)
-      miss = add2(miss, p.mul(new Rational(zRat.n ** n, zRat.d ** n)));
-  }
-  const result = { featureModeId: fm, mean: mean2, second: second2, variance: second2.sub(mean2.mul(mean2)), hitRate: one.sub(miss), featureTriggerProbability: pfeat, expectedFeatureSpins: pfeat.n === 0n ? new Rational(0n) : conditionalSpins.div(pfeat), expectedPaidGameFeatureSpins: paidSpins, featureMean: fm1, featureSecond: fm2 };
-  let a = cache.get(def);
-  if (!a) {
-    a = /* @__PURE__ */ new WeakMap();
-    cache.set(def, a);
-  }
-  let bb = a.get(handlers);
-  if (!bb) {
-    bb = /* @__PURE__ */ new WeakMap();
-    a.set(handlers, bb);
-  }
-  let cc = bb.get(lowering);
-  if (!cc) {
-    cc = /* @__PURE__ */ new WeakMap();
-    bb.set(lowering, cc);
-  }
-  cc.set(observations, result);
-  return result;
-}
-
-// ../dist/src/math/modeStatistics.js
-function solveModeStatistics(def, modeId, opts = {}) {
-  if (!def.modes[modeId])
-    throw new Error(`unknown mode ${modeId}`);
-  const handlers = opts.handlers ?? builtinNodeHandlers, lowering = opts.lowering ?? builtinExactLowering;
-  const capabilities = analyzeCapabilities(def, handlers);
-  if (!capabilities.exactCompatible)
-    throw new Error(`definition is not exact-compatible: ${capabilities.unsupported.join("; ")}`);
-  const start = runDeterministic(def, { modeId: def.entryModeId, nodeId: def.modes[def.entryModeId].entryNodeId, values: {}, frame: {} }, lowering, handlers);
-  const initial = { execution: start.state, visited: start.visitedModes.includes(modeId) };
-  const graph = (metric) => buildReachableStateGraph({
-    initial,
-    maxStates: opts.maxStates,
-    canonicalize: (s) => `${s.visited ? 1 : 0}:${canonicalExecutionState(s.execution)}`,
-    isTerminal: (s) => !!s.execution.terminal,
-    expand: (s) => expandExactBoundary(def, s.execution, lowering, handlers).map((o) => {
-      const visited = s.visited || o.visitedModes.includes(modeId);
-      return { state: { execution: o.state, visited }, probability: o.probability, reward: new Rational(metric === "entry" ? !s.visited && visited ? 1n : 0n : s.execution.modeId === modeId ? 1n : 0n) };
-    })
-  });
-  const probability = initial.visited ? new Rational(1n) : solveFiniteMarkov(graph("entry")).initial.expectedReward;
-  const expectedSteps = solveFiniteMarkov(graph("steps")).initial.expectedReward;
-  return { modeId, probability, expectedSteps, expectedStepsWhenEntered: probability.n === 0n ? new Rational(0n) : expectedSteps.div(probability) };
-}
-function solveModeReward(def, modeId, opts = {}) {
-  const handlers = opts.handlers ?? builtinNodeHandlers, lowering = opts.lowering ?? builtinExactLowering;
-  const start = runDeterministic(def, { modeId: def.entryModeId, nodeId: def.modes[def.entryModeId].entryNodeId, values: {}, frame: {} }, lowering, handlers);
-  const graph = buildReachableStateGraph({
-    initial: start.state,
-    maxStates: opts.maxStates,
-    canonicalize: canonicalExecutionState,
-    isTerminal: (s) => !!s.terminal,
-    expand: (s) => expandExactBoundary(def, s, lowering, handlers).map((o) => ({ state: o.state, probability: o.probability, reward: new Rational(o.rewardByMode[modeId] ?? 0n) }))
-  });
-  return solveFiniteMarkov(graph).initial.expectedReward.add(new Rational(start.rewardByMode[modeId] ?? 0n));
-}
-
-// ../dist/src/math/statePGF.js
-function compileStatePGF(graph) {
-  for (const state of Object.values(graph.states))
-    for (const t of state.transitions) {
-      if (!t.rewardAtoms)
-        throw new Error("state PGF requires individual reward atoms");
-      for (const a of t.rewardAtoms)
-        if (a.reward.n < 0n || a.reward.d !== 1n)
-          throw new Error("state PGF requires non-negative integer rewards");
-    }
-  const r = graph.initialReward;
-  if (r && (r.n < 0n || r.d !== 1n))
-    throw new Error("state PGF requires non-negative integer rewards");
-  return { kind: "STATE_GRAPH_PGF", equation: "F_s(z) = sum p(s,t,r) z^r F_t(z); F_terminal(z) = 1", graph };
-}
-function evaluateStatePGF(p, z) {
-  if (!Number.isFinite(z) || z < 0 || z > 1)
-    throw new Error("PGF evaluation requires 0<=z<=1");
-  const graph = p.graph, states = Object.values(graph.states).filter((s) => !s.terminal), index = new Map(states.map((s, i) => [s.key, i]));
-  const n = states.length, A = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_2, j) => i === j ? 1 : 0)), b = Array(n).fill(0);
-  for (let i = 0; i < n; i++)
-    for (const t of states[i].transitions)
-      for (const atom of t.rewardAtoms) {
-        const weight = t.probability.toNumber() * atom.probability.toNumber() * Math.pow(z, Number(atom.reward.n)), j = index.get(t.to);
-        if (j === void 0) {
-          if (!graph.states[t.to]?.terminal)
-            throw new Error(`missing state ${t.to}`);
-          b[i] += weight;
-        } else
-          A[i][j] -= weight;
-      }
-  const original = A.map((row, i) => [...row, b[i]]), m = original.map((row) => [...row]);
-  for (let col = 0; col < n; col++) {
-    let pivot = col;
-    while (pivot < n && Math.abs(m[pivot][col]) < 1e-14)
-      pivot++;
-    if (pivot === n)
-      throw new Error("singular state PGF system: model may be non-terminating");
-    [m[col], m[pivot]] = [m[pivot], m[col]];
-    const d = m[col][col];
-    for (let j = col; j <= n; j++)
-      m[col][j] /= d;
-    for (let i = 0; i < n; i++)
-      if (i !== col) {
-        const f = m[i][col];
-        for (let j = col; j <= n; j++)
-          m[i][j] -= f * m[col][j];
-      }
-  }
-  const x = m.map((row) => row[n]);
-  let residual = 0;
-  for (let i = 0; i < n; i++)
-    residual = Math.max(residual, Math.abs(original[i].slice(0, n).reduce((s, a, j) => s + a * x[j], 0) - original[i][n]));
-  const initial = index.get(graph.initialState), value = (initial === void 0 ? 1 : x[initial]) * Math.pow(z, Number(graph.initialReward?.n ?? 0n));
-  return { value, residual };
-}
-
-// ../dist/src/math/backendExecutors.js
-function isRegen(execution) {
-  return execution.math.reductions.some((x) => x.kind === "ADDITIVE_REGENERATIVE_COUNTER");
-}
-function wager(def, explicit) {
+// dist/src/math/backendExecutors.js
+function wager2(def, explicit) {
   const b = explicit ?? def.wager?.totalBet;
   if (b === void 0)
     throw new Error("RTP requires query.bet or GameDefinition.wager");
@@ -2591,118 +2977,13 @@ function wager(def, explicit) {
     throw new Error("RTP bet must be positive");
   return b;
 }
-function regen(def, options) {
-  return solveGenericRegenerative(def, { lowering: options?.lowering, handlers: options?.handlers, reelObservations: options?.reelObservations });
-}
-function exactEV(def, execution, options) {
-  if (isRegen(execution)) {
-    const g = regen(def, options);
-    return { ev: g.mean, baseEV: g.mean.sub(g.featureTriggerProbability.mul(g.featureMean)), featureEV: g.featureMean, featureTriggerProbability: g.featureTriggerProbability, expectedFeatureSpins: g.expectedFeatureSpins };
-  }
-  if (execution.decision.kind === "STATE_EXACT") {
-    const x2 = solveFiniteMarkov(execution.decision.graph), modes = Object.keys(def.modes).filter((id) => id !== def.entryModeId), opts = { maxStates: options?.maxStates, handlers: options?.handlers, lowering: options?.lowering };
-    const mode = modes.length === 1 ? solveModeStatistics(def, modes[0], opts) : void 0;
-    const baseEV = modes.length ? solveModeReward(def, def.entryModeId, opts) : x2.initial.expectedReward;
-    const featureEV = mode ? mode.probability.n === 0n ? new Rational(0n) : solveModeReward(def, modes[0], opts).div(mode.probability) : modes.length ? null : new Rational(0n);
-    return { ev: x2.initial.expectedReward, baseEV, featureEV, featureTriggerProbability: mode?.probability ?? (modes.length ? null : new Rational(0n)), expectedFeatureSpins: mode?.expectedStepsWhenEntered ?? (modes.length ? null : new Rational(0n)) };
-  }
-  const x = solveExpectedValueIR(compileExpectedValueIR(def));
-  return { ev: x.totalEV, baseEV: x.baseEV, featureEV: x.featureEV, featureTriggerProbability: x.featureTriggerProbability, expectedFeatureSpins: x.expectedFeatureSpins };
-}
-function exactDuration(def, execution, options) {
-  if (isRegen(execution)) {
-    const g = regen(def, options);
-    return { expectedFeatureSpins: g.expectedFeatureSpins, expectedPaidGameFeatureSpins: g.expectedPaidGameFeatureSpins };
-  }
-  if (execution.decision.kind === "STATE_EXACT") {
-    const x = solveFiniteMarkov(execution.decision.graph);
-    return { expectedFeatureSpins: x.initial.expectedSteps, expectedPaidGameFeatureSpins: x.initial.expectedSteps };
-  }
-  const ir = compileExpectedValueIR(def), link = ir.entryFeature;
-  if (!link)
-    return { expectedFeatureSpins: new Rational(0n), expectedPaidGameFeatureSpins: new Rational(0n) };
-  const f = ir.regenerativeFeatures[link.toModeId];
-  if (!f)
-    throw new Error(`duration: feature ${link.toModeId} is not regenerative`);
-  if (f.decrement !== 1n)
-    throw new Error(`duration: unsupported decrement ${f.decrement}`);
-  const one = solveRegenerative(new Rational(1n), f.spin.triggerProbability.mul(new Rational(f.retriggerAward)));
-  const conditional = one.expectedVisits.mul(new Rational(link.initialSpins));
-  return { expectedFeatureSpins: conditional, expectedPaidGameFeatureSpins: link.triggerProbability.mul(conditional) };
-}
-function featureFrequency(def, modeId, execution, options) {
-  if (!def.modes[modeId])
-    throw new Error(`feature frequency: unknown mode ${modeId}`);
-  if (modeId === def.entryModeId)
-    return { modeId, probability: new Rational(1n) };
-  if (execution && (isRegen(execution) || Object.keys(def.modes).some((id) => hasAdditiveRegenerativeCounter(def, id)))) {
-    const g = regen(def, options);
-    if (modeId !== g.featureModeId)
-      throw new Error(`feature frequency: mode ${modeId} is not a directly supported entry feature`);
-    return { modeId, probability: g.featureTriggerProbability };
-  }
-  return { modeId, probability: solveModeStatistics(def, modeId, { maxStates: options?.maxStates, handlers: options?.handlers, lowering: options?.lowering }).probability };
-}
-var directExecutorRegistry = {
-  EV: ({ def, execution, options }) => exactEV(def, execution, options),
-  RTP: ({ def, query, execution, options }) => {
-    if (query.type !== "RTP")
-      throw new Error("RTP projector mismatch");
-    const bet = wager(def, query.bet), x = exactEV(def, execution, options);
-    return { ...x, bet, rtp: x.ev.div(new Rational(bet)) };
-  },
-  EXPECTED_DURATION: ({ def, query, execution, options }) => {
-    if (query.type === "EXPECTED_DURATION" && query.modeId) {
-      if (Object.keys(def.modes).some((id) => hasAdditiveRegenerativeCounter(def, id))) {
-        const g = regen(def, options);
-        if (g.featureModeId === query.modeId)
-          return { expectedFeatureSpins: g.expectedFeatureSpins, expectedPaidGameFeatureSpins: g.expectedPaidGameFeatureSpins };
-      }
-      const s = solveModeStatistics(def, query.modeId, { maxStates: options.maxStates, handlers: options.handlers, lowering: options.lowering });
-      return { expectedFeatureSpins: s.expectedStepsWhenEntered, expectedPaidGameFeatureSpins: s.expectedSteps };
-    }
-    return exactDuration(def, execution, options);
-  },
-  FEATURE_FREQUENCY: ({ def, query, execution, options }) => {
-    if (query.type !== "FEATURE_FREQUENCY")
-      throw new Error("feature-frequency projector mismatch");
-    return featureFrequency(def, query.modeId, execution, options);
-  },
-  HIT_RATE: ({ def, execution, options }) => isRegen(execution) ? (() => {
-    const g = regen(def, options);
-    return { hitRate: g.hitRate.toNumber(), missRate: 1 - g.hitRate.toNumber(), featureZeroProbability: NaN, fixedPointResidual: 0, iterations: 0 };
-  })() : execution.decision.kind === "STATE_EXACT" ? (() => {
-    const x = evaluateStatePGF(compileStatePGF(execution.decision.graph), 0);
-    return { hitRate: 1 - x.value, missRate: x.value, featureZeroProbability: NaN, fixedPointResidual: x.residual, iterations: 0 };
-  })() : solveExactHitRate(def, options.tolerance ?? 1e-15, options.maxIterations ?? 1e4),
-  VARIANCE: ({ def, execution, options }) => {
-    if (isRegen(execution)) {
-      const g = regen(def, options);
-      return { mean: g.mean, secondMoment: g.second, variance: g.variance, featureMean: g.featureMean, featureSecondMoment: g.featureSecond };
-    }
-    if (execution.decision.kind === "STATE_EXACT") {
-      const x2 = solveFiniteMarkov(execution.decision.graph);
-      return { mean: x2.initial.expectedReward, secondMoment: x2.initial.rewardSecond, variance: x2.initial.rewardVariance, featureMean: new Rational(0n), featureSecondMoment: new Rational(0n) };
-    }
-    const x = solveMomentIR(compileMomentIR(def));
-    return { mean: x.mean, secondMoment: x.second, variance: x.variance, featureMean: x.featureMean, featureSecondMoment: x.featureSecond };
-  },
-  DISTRIBUTION: ({ def, execution, options }) => {
-    const z = options.pgfZ;
-    if (execution.decision.kind === "STATE_EXACT") {
-      const pgf3 = compileStatePGF(execution.decision.graph);
-      return { pgf: pgf3, evaluation: z === void 0 ? void 0 : { z, ...evaluateStatePGF(pgf3, z) } };
-    }
-    const pgf2 = compilePaidGamePGF(def);
-    return { pgf: pgf2, evaluation: z === void 0 ? void 0 : { z, ...evaluatePaidGamePGF(pgf2, z, options.tolerance ?? 1e-14) } };
-  }
-};
+var directExecutorRegistry = Object.fromEntries(Object.entries(exactFoldExecutors).map(([k, f]) => [k, (ctx) => f(ctx)]));
 var hybridProjectorRegistry = {
   EV: (h, ctx) => ({ ...h, approximate: true, hybrid: true, reason: ctx.execution.decision.reason, mean: h.observables.rewardMean }),
   RTP: (h, ctx) => {
     if (ctx.query.type !== "RTP")
       throw new Error("RTP projector mismatch");
-    return { ...h, approximate: true, hybrid: true, reason: ctx.execution.decision.reason, mean: h.observables.rewardMean, bet: wager(ctx.def, ctx.query.bet), rtp: h.observables.rewardMean / Number(wager(ctx.def, ctx.query.bet)) };
+    return { ...h, approximate: true, hybrid: true, reason: ctx.execution.decision.reason, mean: h.observables.rewardMean, bet: wager2(ctx.def, ctx.query.bet), rtp: h.observables.rewardMean / Number(wager2(ctx.def, ctx.query.bet)) };
   },
   VARIANCE: (h, ctx) => ({ ...h, approximate: true, hybrid: true, reason: ctx.execution.decision.reason, queryType: "VARIANCE", mean: h.observables.rewardMean, variance: h.observables.rewardSecond - h.observables.rewardMean * h.observables.rewardMean }),
   EXPECTED_DURATION: (h, ctx) => ({ ...h, approximate: true, hybrid: true, reason: ctx.execution.decision.reason, queryType: "EXPECTED_DURATION", expectedSteps: h.observables.steps }),
@@ -2729,17 +3010,17 @@ function executeBackend(ctx) {
   return executor(ctx);
 }
 
-// web/shims/os.js
+// bench/web/shims/os.js
 var os_default = { availableParallelism: () => 1, cpus: () => [{}] };
 
-// web/shims/worker_threads.js
+// bench/web/shims/worker_threads.js
 var Worker = class {
   constructor() {
     throw new Error("worker_threads not available in browser");
   }
 };
 
-// ../dist/src/math/cascadeExact.js
+// dist/src/math/primitives/folds/stopEnum.js
 var lit = (e, env) => {
   if (!e)
     return;
@@ -2861,71 +3142,18 @@ function compileCascade(def) {
   return null;
 }
 function cascadeKernel(T) {
-  const { rows: R2, cols: C, lines, pay, wild: W, multipliers: MULT, prune } = T, P = C + 1, NL = lines.length;
-  const strips = T.strips.map((s) => Int16Array.from(s)), LEN = strips.map((s) => s.length);
-  const LR = Int8Array.from(lines.flat());
-  const board = new Int16Array(R2 * C), stops = new Int32Array(C), hitCnt = new Int8Array(NL), tmp = new Int16Array(R2);
-  const evalWin = () => {
-    let win = 0;
-    for (let l = 0; l < NL; l++) {
-      const o = l * C;
-      let t = -1;
-      for (let c2 = 0; c2 < C; c2++) {
-        const s = board[LR[o + c2] * C + c2];
-        if (s !== W) {
-          t = s;
-          break;
-        }
-      }
-      if (t < 0)
-        t = W;
-      let n = 0;
-      for (; n < C; n++) {
-        const s = board[LR[o + n] * C + n];
-        if (s !== t && s !== W)
-          break;
-      }
-      const p = pay[t * P + n];
-      hitCnt[l] = p > 0 ? n : 0;
-      win += p;
-    }
-    return win;
-  };
-  const doTumble = () => {
-    for (let c2 = 0; c2 < C; c2++) {
-      let mask = 0;
-      for (let l = 0; l < NL; l++)
-        if (hitCnt[l] > c2)
-          mask |= 1 << LR[l * C + c2];
-      if (!mask)
-        continue;
-      let k = 0, rem = 0;
-      for (let r = 0; r < R2; r++)
-        if (mask & 1 << r)
-          rem++;
-        else
-          tmp[k++] = board[r * C + c2];
-      const L = LEN[c2], st = ((stops[c2] - rem) % L + L) % L;
-      stops[c2] = st;
-      for (let i = 0; i < rem; i++)
-        board[i * C + c2] = strips[c2][(st + i) % L];
-      for (let i = 0; i < k; i++)
-        board[(rem + i) * C + c2] = tmp[i];
-    }
-  };
+  const { cols: C, pay, wild: W, multipliers: MULT, prune } = T;
+  const ops = boardOps(T);
+  const { strips, LEN, LR, NL, P } = ops;
   const play2 = (s) => {
-    for (let c2 = 0; c2 < C; c2++) {
-      stops[c2] = s[c2];
-      for (let r = 0; r < R2; r++)
-        board[r * C + c2] = strips[c2][(s[c2] + r) % LEN[c2]];
-    }
+    ops.spin(s);
     let tot = 0;
     for (let t = 0; t < MULT.length; t++) {
-      const w = evalWin();
+      const w = ops.winCells();
       if (w <= 0)
         break;
-      tot += w * MULT[t];
-      doTumble();
+      tot += w * ladderMultiplier(MULT, t);
+      ops.dynamicsRefill();
     }
     return tot;
   };
@@ -2984,7 +3212,7 @@ function enumerateCascade(T, opts = {}) {
     const sab = new SharedArrayBuffer(8 * (1 + 5 * nW)), done = new Int32Array(sab, 0, 1), out = new Float64Array(sab, 8);
     const ws = [];
     for (let w = 0; w < nW; w++) {
-      const wk = new Worker(new URL("./cascadeExactWorker.js", import.meta.url), { workerData: { T, from: w, step: nW, sab, index: w } });
+      const wk = new Worker(new URL("./stopEnumWorker.js", import.meta.url), { workerData: { T, from: w, step: nW, sab, index: w } });
       wk.unref();
       ws.push(wk);
     }
@@ -3028,7 +3256,7 @@ function solveCascadeExact(def, opts = {}) {
   return { ev, secondMoment: m2, variance: m2.sub(ev.mul(ev)), hitRate: new Rational(BigInt(m.hits), N), outcomes: N, evaluated: m.evaluated, maxPayout: BigInt(m.max), bet, rtp: ev.div(new Rational(bet)), workers: m.workers, ms: performance.now() - t0, method: "CASCADE_DENSE_STOP_ENUMERATION" };
 }
 
-// ../dist/src/math/holdWinExact.js
+// dist/src/math/primitives/folds/maskMarkov.js
 function compileHoldWin(def) {
   const modes = Object.values(def.modes);
   if (modes.length !== 2)
@@ -3094,39 +3322,15 @@ function compileHoldWin(def) {
   return { linePaytableId: lines.evaluator.paytableId, lineIds: [...lines.evaluator.paylineIds], wildTag: lines.evaluator.wildTag, rows, cols: bR.length, baseReels: bR.map((r) => [...r.symbols]), holdReels: hR.map((r) => [...r.symbols]), coinValue: coinValue2, trigger: Number(trig.expression.right.const), respins: Number(setR.value.const), grand: Number(grand.amount.const) };
 }
 var nodes = (n, id) => n[id];
+function coinTables(S, reels) {
+  const P = 1 << S.rows;
+  const isCoin = (s) => s in S.coinValue;
+  return reels.map((st) => Array.from({ length: P }, (_, p) => maskUpdateColumn(st, S.rows, p, isCoin, (s) => S.coinValue[s]).map(([q, n, v]) => [q, n / st.length, v / st.length])));
+}
 function holdWinValueFunction(S) {
   const { rows: R2, cols: C, respins: RS, grand: G } = S, P = 1 << R2, FULL = 2 ** (R2 * C) - 1;
-  const isCoin = (s) => s in S.coinValue;
-  const tab = (strip2, p) => {
-    const m = /* @__PURE__ */ new Map(), L = strip2.length;
-    for (let st = 0; st < L; st++) {
-      let q = p, v = 0;
-      for (let r = 0; r < R2; r++) {
-        if (p >> r & 1)
-          continue;
-        const s = strip2[(st + r) % L];
-        if (isCoin(s)) {
-          q |= 1 << r;
-          v += S.coinValue[s];
-        }
-      }
-      const e = m.get(q) ?? [0, 0];
-      e[0] += 1 / L;
-      e[1] += v / L;
-      m.set(q, e);
-    }
-    return [...m].map(([q, [a, b]]) => [q, a, b]);
-  };
-  const T = S.holdReels.map((s) => Array.from({ length: P }, (_, p) => tab(s, p)));
-  const pc = (m) => {
-    let n = 0;
-    while (m) {
-      m &= m - 1;
-      n++;
-    }
-    return n;
-  };
-  const order = Array.from({ length: FULL + 1 }, (_, i) => i).sort((a, b) => pc(b) - pc(a));
+  const T = coinTables(S, S.holdReels);
+  const order = Array.from({ length: FULL + 1 }, (_, i) => i).sort((a, b) => popcount(b) - popcount(a));
   const V = new Float64Array(FULL + 1);
   let terms = 0;
   for (const m of order) {
@@ -3153,51 +3357,24 @@ function holdWinValueFunction(S) {
         rec(c2 + 1, mm | q2 << R2 * c2, pr * p, ev * p + e * pr);
     };
     rec(0, 0, 1, 0);
-    let geo = 0, qq = 1;
-    for (let i = 0; i < RS; i++) {
-      geo += qq;
-      qq *= q;
-    }
-    V[m] = A * geo;
+    V[m] = A * respinResetGeometric(q, RS);
   }
-  return { V, terms, tab, pc, FULL };
+  return { V, terms, FULL };
 }
 function exactLineEV(def, S) {
-  const freq = S.baseReels.map((st) => {
-    const m = /* @__PURE__ */ new Map();
-    for (const x of st)
-      m.set(x, (m.get(x) ?? 0) + 1);
-    return [...m];
-  });
-  const lineDef = { ...def, paylines: { "@L": { id: "@L", rows: Array(S.cols).fill(0) } } };
-  let num2 = 0n;
-  const seq = [];
-  const go = (c2, w) => {
-    if (c2 === S.cols) {
-      const p = evaluatePaylines(lineDef, { rows: 1, cols: S.cols, stops: Array(S.cols).fill(0), symbols: [seq] }, S.linePaytableId, ["@L"], S.wildTag).reduce((a, x) => a + x.payout, 0n);
-      num2 += p * w;
-      return;
-    }
-    for (const [x, k] of freq[c2]) {
-      seq[c2] = x;
-      go(c2 + 1, w * BigInt(k));
-    }
-  };
-  go(0, 1n);
-  const den = S.baseReels.reduce((a, s) => a * BigInt(s.length), 1n);
-  return new Rational(num2 * BigInt(S.lineIds.length), den);
+  return new Rational(maskedLinePayNumerator(def, { paytableId: S.linePaytableId, lineIds: S.lineIds, wildTag: S.wildTag, cols: S.cols }, S.baseReels), stopSpace(S.baseReels));
 }
 function solveHoldWinExact(def, _opts = {}) {
   const S = compileHoldWin(def);
   if (!S)
     return null;
   const t0 = performance.now();
-  const { V, terms, tab, pc, FULL } = holdWinValueFunction(S);
-  const B = S.baseReels.map((s) => tab(s, 0));
+  const { V, terms, FULL } = holdWinValueFunction(S);
+  const B = coinTables(S, S.baseReels).map((t) => t[0]);
   let pT = 0, evT = 0, coinT = 0;
   const rec = (c2, mm, pr, ev2) => {
     if (c2 === S.cols) {
-      if (pc(mm) >= S.trigger) {
+      if (popcount(mm) >= S.trigger) {
         pT += pr;
         coinT += ev2;
         evT += ev2 + pr * (mm === FULL ? S.grand : V[mm]);
@@ -3213,8 +3390,6 @@ function solveHoldWinExact(def, _opts = {}) {
   const ev = line.toNumber() + evT;
   return { ev, rtp: ev / Number(bet), bet, lineEV: line, featureEV: evT, featureTriggerProbability: pT, featureEVGivenTrigger: evT / pT, coinsEVAtTrigger: coinT / pT, states: (FULL + 1) * S.respins, transitionTerms: terms, ms: performance.now() - t0, method: "HOLD_WIN_MASK_RESPIN_MARKOV" };
 }
-
-// ../dist/src/math/stickyWildExact.js
 function compileStickyWild(def) {
   const base3 = def.modes[def.entryModeId];
   if (!base3 || Object.keys(def.modes).length !== 2)
@@ -3244,18 +3419,29 @@ function compileStickyWild(def) {
   const en = bn[set.next];
   if (en?.operation?.type !== "ENTER_MODE")
     return null;
-  const fm = def.modes[en.operation.modeId];
+  const F = compileStickyFS(def, en.operation.modeId, set.target, Number(set.value.const));
+  if (!F || F.rows !== Number(sp.source.rows))
+    return null;
+  if (F.paytableId !== li.evaluator.paytableId || F.lineIds.join() !== li.evaluator.paylineIds.join() || (li.evaluator.wildTag ?? "WILD") !== F.wildTag)
+    return null;
+  const bR = def.reelSets[sp.source.reelSetId].reels;
+  if (bR.length !== F.cols)
+    return null;
+  return { ...F, baseReels: bR.map((r) => [...r.symbols]), scatterTag: ct.evaluator.tag, trigger: Number(tr.expression.right.const) };
+}
+function compileStickyFS(def, fsModeId, counter, spins) {
+  const fm = def.modes[fsModeId];
   if (!fm)
     return null;
   const fn = fm.nodes;
   const fsp = fn[fm.entryNodeId];
-  if (fsp?.source?.type !== "REEL_SPIN" || Number(fsp.source.rows) !== Number(sp.source.rows))
+  if (fsp?.source?.type !== "REEL_SPIN")
     return null;
   const st = fn[fsp.next];
   if (st?.kind !== "STICKY_WILD" || st.board !== fsp.output)
     return null;
   const fl = fn[st.next];
-  if (fl?.evaluator?.type !== "PAYLINES" || fl.evaluator.board !== st.output || fl.evaluator.paytableId !== li.evaluator.paytableId || fl.evaluator.paylineIds.join() !== li.evaluator.paylineIds.join())
+  if (fl?.evaluator?.type !== "PAYLINES" || fl.evaluator.board !== st.output)
     return null;
   const fs2 = fn[fl.next];
   if (fs2?.evaluator?.type !== "SUM_WINS" || fs2.evaluator.wins !== fl.output)
@@ -3264,90 +3450,29 @@ function compileStickyWild(def) {
   if (fa?.kind !== "AWARD" || fa.amount?.ref !== fs2.output)
     return null;
   const dec = fn[fa.next];
-  if (dec?.kind !== "STATE" || dec.op !== "ADD" || dec.target !== set.target || Number(dec.value.const) !== -1)
+  if (dec?.kind !== "STATE" || dec.op !== "ADD" || dec.target !== counter || Number(dec.value.const) !== -1)
     return null;
   const mo = fn[dec.next];
-  if (mo?.kind !== "CONDITION" || mo.expression.op !== ">" || mo.expression.left?.ref !== `$state.${set.target}` || Number(mo.expression.right.const) !== 0 || mo.onTrue !== fsp.id || fn[mo.onFalse]?.operation?.type !== "END_GAME")
+  if (mo?.kind !== "CONDITION" || mo.expression.op !== ">" || mo.expression.left?.ref !== `$state.${counter}` || Number(mo.expression.right.const) !== 0 || mo.onTrue !== fsp.id || fn[mo.onFalse]?.operation?.type !== "END_GAME")
     return null;
-  const wildTag = li.evaluator.wildTag ?? "WILD";
+  const wildTag = fl.evaluator.wildTag ?? "WILD";
   if (!def.symbols[st.wild]?.tags.includes(wildTag))
     return null;
-  const bR = def.reelSets[sp.source.reelSetId].reels, fR = def.reelSets[fsp.source.reelSetId].reels;
-  if (bR.length !== fR.length)
-    return null;
-  return { paytableId: li.evaluator.paytableId, lineIds: [...li.evaluator.paylineIds], wildTag, wild: st.wild, rows: Number(sp.source.rows), cols: bR.length, baseReels: bR.map((r) => [...r.symbols]), fsReels: fR.map((r) => [...r.symbols]), scatterTag: ct.evaluator.tag, trigger: Number(tr.expression.right.const), spins: Number(set.value.const) };
+  const fR = def.reelSets[fsp.source.reelSetId].reels;
+  return { paytableId: fl.evaluator.paytableId, lineIds: [...fl.evaluator.paylineIds], wildTag, wild: st.wild, rows: Number(fsp.source.rows), cols: fR.length, fsReels: fR.map((r) => [...r.symbols]), spins };
 }
-function linePayNumerator(def, S, reels, mask, cache3) {
-  const freq = reels.map((st) => {
-    const m = /* @__PURE__ */ new Map();
-    for (const x of st)
-      m.set(x, (m.get(x) ?? 0n) + 1n);
-    return [...m];
-  });
-  const one = { ...def, paylines: { "@L": { id: "@L", rows: Array(S.cols).fill(0) } } };
-  let tot = 0n;
-  for (const id of S.lineIds) {
-    const rows = def.paylines[id].rows;
-    const stuck = rows.map((r, c2) => mask >> r * S.cols + c2 & 1).join("");
-    let v = cache3.get(stuck);
-    if (v === void 0) {
-      v = 0n;
-      const seq = [];
-      const go = (c2, w) => {
-        if (c2 === S.cols) {
-          const p = evaluatePaylines(one, { rows: 1, cols: S.cols, stops: Array(S.cols).fill(0), symbols: [seq] }, S.paytableId, ["@L"], S.wildTag).reduce((a, x) => a + x.payout, 0n);
-          v += p * w;
-          return;
-        }
-        if (stuck[c2] === "1") {
-          seq[c2] = S.wild;
-          go(c2 + 1, w * BigInt(reels[c2].length));
-          return;
-        }
-        for (const [x, k] of freq[c2]) {
-          seq[c2] = x;
-          go(c2 + 1, w * k);
-        }
-      };
-      go(0, 1n);
-      cache3.set(stuck, v);
-    }
-    tot += v;
-  }
-  return tot;
-}
-function solveStickyWildExact(def) {
-  const S = compileStickyWild(def);
-  if (!S)
-    return null;
-  const t0 = performance.now();
+function stickyFsValue(def, S) {
   const { rows: R2, cols: C } = S;
-  const D = S.fsReels.reduce((a, s) => a * BigInt(s.length), 1n), DB = S.baseReels.reduce((a, s) => a * BigInt(s.length), 1n);
-  const colT = S.fsReels.map((st) => {
-    const m = /* @__PURE__ */ new Map();
-    for (let s = 0; s < st.length; s++) {
-      let p = 0;
-      for (let r = 0; r < R2; r++)
-        if (st[(s + r) % st.length] === S.wild)
-          p |= 1 << r;
-      m.set(p, (m.get(p) ?? 0n) + 1n);
-    }
-    return [...m];
-  });
-  const toMask = (c2, p) => {
-    let m = 0;
-    for (let r = 0; r < R2; r++)
-      if (p >> r & 1)
-        m |= 1 << r * C + c2;
-    return m;
-  };
+  const LS = { paytableId: S.paytableId, lineIds: S.lineIds, wildTag: S.wildTag, cols: C };
+  const D = stopSpace(S.fsReels);
+  const colT = S.fsReels.map((st) => maskUpdateColumn(st, R2, 0, (s) => s === S.wild).map(([p, n]) => [p, BigInt(n)]));
   const trans = (m) => {
     let acc = /* @__PURE__ */ new Map([[m, 1n]]);
     for (let c2 = 0; c2 < C; c2++) {
       const nx = /* @__PURE__ */ new Map();
       for (const [mm, w] of acc)
         for (const [p, k] of colT[c2]) {
-          const q = mm | toMask(c2, p);
+          const q = mm | columnToMask(c2, p, R2, C);
           nx.set(q, (nx.get(q) ?? 0n) + w * k);
         }
       acc = nx;
@@ -3367,7 +3492,7 @@ function solveStickyWildExact(def) {
   }
   const cache3 = /* @__PURE__ */ new Map(), Np = /* @__PURE__ */ new Map();
   for (const m of seen)
-    Np.set(m, linePayNumerator(def, S, S.fsReels, m, cache3));
+    Np.set(m, maskedLinePayNumerator(def, LS, S.fsReels, m, S.wild, cache3));
   let U = new Map([...seen].map((m) => [m, 0n]));
   let Dk = 1n;
   for (let k = 1; k <= S.spins; k++) {
@@ -3381,61 +3506,270 @@ function solveStickyWildExact(def) {
     U = nu;
     Dk *= D;
   }
-  const fsEV = new Rational(U.get(0), Dk);
-  let dist = [1n];
-  for (const st of S.baseReels) {
-    const cnt = [];
-    for (let s = 0; s < st.length; s++) {
-      let n = 0;
-      for (let r = 0; r < R2; r++)
-        if (def.symbols[st[(s + r) % st.length]]?.tags.includes(S.scatterTag))
-          n++;
-      cnt[n] = (cnt[n] ?? 0n) + 1n;
-    }
-    const nd = [];
-    dist.forEach((a, i) => cnt.forEach((b, j) => {
-      if (b)
-        nd[i + j] = (nd[i + j] ?? 0n) + a * (b ?? 0n);
-    }));
-    dist = nd;
-  }
+  return { fsEV: new Rational(U.get(0), Dk), reachableMasks: seen.size };
+}
+function solveStickyWildExact(def) {
+  const S = compileStickyWild(def);
+  if (!S)
+    return null;
+  const t0 = performance.now();
+  const LS = { paytableId: S.paytableId, lineIds: S.lineIds, wildTag: S.wildTag, cols: S.cols };
+  const R2 = S.rows;
+  const DB = stopSpace(S.baseReels);
+  const { fsEV, reachableMasks } = stickyFsValue(def, S);
+  const seen = { size: reachableMasks };
+  const dist = tagCountDistribution(S.baseReels, R2, (s) => !!def.symbols[s]?.tags.includes(S.scatterTag));
   let trig = 0n;
   dist.forEach((w, i) => {
     if (i >= S.trigger && w)
       trig += w;
   });
   const pT = new Rational(trig, DB);
-  const baseLine = new Rational(linePayNumerator(def, S, S.baseReels, 0, /* @__PURE__ */ new Map()), DB);
-  const featureEV = pT.mul(fsEV);
-  const ev = baseLine.add(featureEV);
+  const baseLine = new Rational(maskedLinePayNumerator(def, LS, S.baseReels), DB);
+  const { ev, featureEV } = composeRegen(baseLine, pT, fsEV);
   const bet = def.wager?.totalBet ?? 1n;
   return { ev, bet, rtp: ev.div(new Rational(bet)), baseLineEV: baseLine, featureEV, featureTriggerProbability: pT, featureEVGivenTrigger: fsEV, reachableMasks: seen.size, states: seen.size * S.spins, ms: performance.now() - t0, method: "STICKY_WILD_MASK_SPINS_MARKOV" };
 }
 
-// ../dist/src/math/mechanicExact.js
-var plan = (query, solver, scope, reason, diag, reductions) => ({ query, solver, exact: true, observables: [], livePersistentState: [], syntheticState: [], reductions, stages: [{ id: "mechanic-exact", solver, scope, reason }], diagnostics: diag, estimatedSourceOutcomes: {} });
-var mechanicExactQueries = { cascade: ["EV", "RTP", "VARIANCE", "HIT_RATE"], holdWin: ["EV", "RTP"], stickyWild: ["EV", "RTP"] };
-function solveMechanicExact(def, query, ctx = {}) {
-  const q = query.type;
-  if (mechanicExactQueries.cascade.includes(q)) {
-    const r = solveCascadeExact(def);
-    if (r)
-      return cascadeAnswer(query, r);
-  }
-  if (mechanicExactQueries.holdWin.includes(q)) {
-    const r = solveHoldWinExact(def, ctx);
-    if (r)
-      return holdWinAnswer(query, r);
-  }
-  if (mechanicExactQueries.stickyWild.includes(q)) {
-    const r = solveStickyWildExact(def);
-    if (r)
-      return stickyAnswer(query, r);
+// dist/src/math/primitives/folds/compose.js
+var clone = (x) => structuredClone(x);
+var js = (x) => JSON.stringify(x, (_, v) => typeof v === "bigint" ? String(v) : v);
+function splitFsTrigger(def) {
+  const base3 = def.modes[def.entryModeId];
+  if (!base3)
+    return null;
+  const bn = base3.nodes;
+  for (const ct of Object.values(bn)) {
+    if (ct.evaluator?.type !== "COUNT_TAG")
+      continue;
+    const chk = Object.values(bn).find((n) => n.kind === "CONDITION" && n.expression?.op === ">=" && n.expression.left?.ref === ct.output);
+    if (!chk)
+      continue;
+    const set = bn[chk.onTrue];
+    if (set?.kind !== "STATE" || set.op !== "SET" || !("const" in (set.value ?? {})))
+      continue;
+    const en = bn[set.next];
+    if (en?.operation?.type !== "ENTER_MODE")
+      continue;
+    const fsModeId = en.operation.modeId;
+    const fm = def.modes[fsModeId];
+    if (!fm || fsModeId === def.entryModeId)
+      continue;
+    const uses = Object.values(bn).filter((n) => n !== chk && js(n).includes(`"${ct.output}"`) && n !== ct);
+    if (uses.length)
+      continue;
+    if (Object.values(fm.nodes).some((n) => n.operation?.type === "ENTER_MODE"))
+      continue;
+    const sb = clone(def);
+    const nb = sb.modes[sb.entryModeId].nodes;
+    const redirect = (id) => id === ct.id ? ct.next : id === chk.id ? chk.onFalse : id;
+    for (const k of [ct.id, chk.id, set.id, en.id])
+      delete nb[k];
+    for (const n of Object.values(nb))
+      for (const f of ["next", "onTrue", "onFalse"])
+        if (typeof n[f] === "string")
+          n[f] = redirect(redirect(n[f]));
+    if (sb.modes[sb.entryModeId].entryNodeId === ct.id)
+      sb.modes[sb.entryModeId].entryNodeId = ct.next;
+    delete sb.modes[fsModeId];
+    if (Object.values(sb.modes).some((m) => js(m).includes(`"${fsModeId}"`)))
+      continue;
+    const entry = clone(def);
+    entry.entryModeId = "FS_ENTRY";
+    entry.modes = { FS_ENTRY: { id: "FS_ENTRY", entryNodeId: "fs_set", nodes: { fs_set: { ...clone(set), id: "fs_set", next: "fs_enter" }, fs_enter: { ...clone(en), id: "fs_enter" } } }, [fsModeId]: clone(fm) };
+    const sticky = Object.values(fm.nodes).some((n) => n.kind === "STICKY_WILD");
+    return { scatterTag: ct.evaluator.tag, trigger: Number(chk.expression.right.const), spins: Number(set.value.const), counter: set.target, fsModeId, base: sb, entry, sticky };
   }
   return null;
 }
+function fsEntryValue(def, sp, regenEV2) {
+  if (sp.sticky) {
+    const S = compileStickyFS(def, sp.fsModeId, sp.counter, sp.spins);
+    if (!S)
+      return null;
+    return { value: stickyFsValue(def, S).fsEV, inner: "maskMarkov" };
+  }
+  const v = regenEV2(sp.entry);
+  return v ? { value: v, inner: "regen" } : null;
+}
+function solveCascadeFreeSpins(def, regenEV2, opts = {}) {
+  const sp = splitFsTrigger(def);
+  if (!sp || sp.sticky)
+    return null;
+  if (!compileCascade(sp.base))
+    return null;
+  const t0 = performance.now();
+  const F = fsEntryValue(def, sp, regenEV2);
+  if (!F)
+    return null;
+  const c2 = solveCascadeExact(sp.base, opts);
+  if (!c2)
+    return null;
+  const bm = sp.base.modes[sp.base.entryModeId];
+  const spin2 = Object.values(bm.nodes).find((n) => n.source?.type === "REEL_SPIN");
+  const reels = def.reelSets[spin2.source.reelSetId].reels.map((r) => r.symbols);
+  const dist = tagCountDistribution(reels, Number(spin2.source.rows), (s) => !!def.symbols[s]?.tags.includes(sp.scatterTag));
+  let w = 0n;
+  dist.forEach((x, i) => {
+    if (i >= sp.trigger && x)
+      w += x;
+  });
+  const pT = new Rational(w, stopSpace(reels));
+  const { ev, featureEV } = composeRegen(c2.ev, pT, F.value);
+  const bet = def.wager?.totalBet ?? 1n;
+  return { ev, bet, rtp: ev.div(new Rational(bet)), baseEV: c2.ev, featureEV, featureTriggerProbability: pT, featureEVGivenTrigger: F.value, base: "stopEnum", inner: F.inner, exactRational: true, method: "COMPOSE(stopEnum base, regen FS)", ms: performance.now() - t0, cascade: c2 };
+}
+function solveHoldWinFreeSpins(def, regenEV2) {
+  const sp = splitFsTrigger(def);
+  if (!sp)
+    return null;
+  const S = compileHoldWin(sp.base);
+  if (!S)
+    return null;
+  const t0 = performance.now();
+  const F = fsEntryValue(def, sp, regenEV2);
+  if (!F)
+    return null;
+  const Fn = F.value.toNumber();
+  const { V, FULL } = holdWinValueFunction(S);
+  const R2 = S.rows, cap = sp.trigger;
+  const isScat = (s) => !!def.symbols[s]?.tags.includes(sp.scatterTag);
+  const cols = S.baseReels.map((st) => {
+    const m = /* @__PURE__ */ new Map(), L = st.length;
+    for (let i = 0; i < L; i++) {
+      let sc = 0, p = 0, v = 0;
+      for (let r = 0; r < R2; r++) {
+        const s = st[(i + r) % L];
+        if (isScat(s))
+          sc++;
+        if (s in S.coinValue) {
+          p |= 1 << r;
+          v += S.coinValue[s];
+        }
+      }
+      const k = `${sc}|${p}`;
+      const e = m.get(k) ?? [sc, p, 0, 0];
+      e[2] += 1 / L;
+      e[3] += v / L;
+      m.set(k, e);
+    }
+    return [...m.values()];
+  });
+  let pFS = 0, pH = 0, evH = 0;
+  const rec = (c2, sc, mm, pr, ev2) => {
+    if (c2 === S.cols) {
+      if (sc >= cap)
+        pFS += pr;
+      else if (popcount(mm) >= S.trigger) {
+        pH += pr;
+        evH += ev2 + pr * (mm === FULL ? S.grand : V[mm]);
+      }
+      return;
+    }
+    for (const [s, q, p, e] of cols[c2])
+      rec(c2 + 1, Math.min(cap, sc + s), mm | q << R2 * c2, pr * p, ev2 * p + e * pr);
+  };
+  rec(0, 0, 0, 1, 0);
+  const line = exactLineEV(sp.base, S);
+  const featureEV = pFS * Fn + evH;
+  const ev = line.toNumber() + featureEV;
+  const bet = def.wager?.totalBet ?? 1n;
+  return { ev, bet, rtp: ev / Number(bet), baseEV: line, featureEV, featureTriggerProbability: pFS, featureEVGivenTrigger: F.value, holdEV: evH, base: "maskMarkov", inner: F.inner, exactRational: false, method: "COMPOSE(maskMarkov coin base, FS)", ms: performance.now() - t0, spec: S };
+}
+
+// dist/src/math/primitives/runner.js
+var foldQueries = { stopEnum: ["EV", "RTP", "VARIANCE", "HIT_RATE"], maskMarkovCoin: ["EV", "RTP"], maskMarkovSticky: ["EV", "RTP"], composed: ["EV", "RTP"] };
+var cascadeFsFold = { kind: "regen", inner: { kind: "stopEnum", ladder: true }, base: { kind: "stopEnum", ladder: true }, buyOnly: false, retrigger: false };
+var holdFsFold = (sticky) => ({ kind: "regen", inner: sticky ? { kind: "maskMarkov", mask: "stickyWild" } : { kind: "columnDP", observe: ["lines"] }, base: { kind: "maskMarkov", mask: "coin" }, buyOnly: false, retrigger: false });
+function specialisedFold(def) {
+  if (compileCascade(def))
+    return { kind: "stopEnum", ladder: true };
+  if (compileHoldWin(def))
+    return { kind: "maskMarkov", mask: "coin" };
+  if (compileStickyWild(def))
+    return { kind: "regen", inner: { kind: "maskMarkov", mask: "stickyWild" }, buyOnly: false, retrigger: false };
+  const sp = splitFsTrigger(def);
+  if (sp && !sp.sticky && compileCascade(sp.base))
+    return cascadeFsFold;
+  if (sp && compileHoldWin(sp.base))
+    return holdFsFold(sp.sticky);
+  return null;
+}
+function genericFold(def, execution) {
+  if (!execution.math.exact)
+    return { kind: "mc", reason: execution.math.diagnostics.at(-1) ?? "no exact fold" };
+  return genericFoldPlan(def, execution);
+}
+var plan = (def, query, options) => buildExecutionPlan(def, query, { pgfZ: options.pgfZ, maxStates: options.maxStates, mcSamples: options.mcSamples, lowering: options.lowering, handlers: options.handlers, reelObservations: options.reelObservations, solverCapabilities: options.solverCapabilities, compiledQuery: options.compiledQuery });
+function holdStateBoundExceeded(def, options) {
+  const sp = splitFsTrigger(def);
+  const S = sp && compileHoldWin(sp.base);
+  if (!S)
+    return false;
+  const states = Math.pow(1 + Object.keys(S.coinValue).length, S.rows * S.cols) * S.respins;
+  return states > (options.maxStates ?? defaultSolverBudget.maxStates);
+}
+function isCascadeStructure(def) {
+  const f = specialisedFold(def);
+  return !!f && (f.kind === "stopEnum" || f.kind === "regen" && f.base?.kind === "stopEnum");
+}
+function runSpecialisedFold(def, query, options = {}) {
+  const q = query.type;
+  if (foldQueries.composed.includes(q)) {
+    const regenEV2 = (d) => {
+      try {
+        const m = regenerativeSolve(d, {}).mean;
+        if (m instanceof Rational)
+          return m;
+      } catch {
+      }
+      const r = runPipeline(d, { type: "EV" }, options);
+      const ev = r.result.ev;
+      return r.plan.exact && ev instanceof Rational ? ev : null;
+    };
+    const c2 = solveCascadeFreeSpins(def, regenEV2);
+    if (c2)
+      return { fold: cascadeFsFold, ...composedAnswer(query, c2) };
+    const h = solveHoldWinFreeSpins(def, regenEV2);
+    if (h)
+      return { fold: holdFsFold(h.inner === "maskMarkov"), ...composedAnswer(query, h) };
+  }
+  if (foldQueries.stopEnum.includes(q)) {
+    const r = solveCascadeExact(def);
+    if (r)
+      return { fold: { kind: "stopEnum", ladder: true }, ...cascadeAnswer(query, r) };
+  }
+  if (foldQueries.maskMarkovCoin.includes(q)) {
+    const r = solveHoldWinExact(def);
+    if (r)
+      return { fold: { kind: "maskMarkov", mask: "coin" }, ...holdWinAnswer(query, r) };
+  }
+  if (foldQueries.maskMarkovSticky.includes(q)) {
+    const r = solveStickyWildExact(def);
+    if (r)
+      return { fold: { kind: "regen", inner: { kind: "maskMarkov", mask: "stickyWild" }, buyOnly: false, retrigger: false }, ...stickyAnswer(query, r) };
+  }
+  return null;
+}
+function runPipeline(def, query, options = {}) {
+  if (isCascadeStructure(def)) {
+    const spec = runSpecialisedFold(def, query, options);
+    if (spec)
+      return spec;
+  }
+  const execution = plan(def, query, options);
+  if (!execution.math.exact || holdStateBoundExceeded(def, options)) {
+    const spec = runSpecialisedFold(def, query, options);
+    if (spec)
+      return spec;
+  }
+  const kind = execution.decision.kind, fold = genericFold(def, execution);
+  const result = fold.kind !== "mc" && (kind === "DIRECT" || kind === "STATE_EXACT") && !options.backendExecutors?.[kind] ? runExactFold({ def, query, execution, options }) : executeBackend({ def, query, execution, options });
+  return { fold, plan: execution.math, result };
+}
+var mkPlan = (query, solver, fold, scope, reason, diag, reductions) => ({ query, solver, exact: true, observables: [], livePersistentState: [], syntheticState: [], reductions, stages: [{ id: `fold:${fold}`, solver, scope, reason }], diagnostics: [`fold=${fold}`, ...diag], estimatedSourceOutcomes: {} });
 function cascadeAnswer(query, r) {
-  const p = plan(query, "ENUM", "paid spin stops (whole tumble chain)", "TUMBLE chain is a deterministic function of the paid-spin stop vector: dense enumeration of all stops", [`outcomes=${r.outcomes}`, `evaluated=${r.evaluated}`, `workers=${r.workers}`, `ms=${r.ms.toFixed(0)}`, r.method], [{ kind: "PRUNE", scope: "reels 1-3", reason: "no paying 3-of-a-kind on reels 1-3 => zero win, no tumble" }]);
+  const p = mkPlan(query, "ENUM", "stopEnum", "paid spin stops (whole tumble chain)", "Spin \u2192 (WinCells \u2192 BoardDynamics \u2192 Refill(strip) \u2192 CounterStep ladder)*: deterministic in the stop vector, dense enumeration", [`outcomes=${r.outcomes}`, `evaluated=${r.evaluated}`, `workers=${r.workers}`, `ms=${r.ms.toFixed(0)}`, r.method], [{ kind: "PRUNE", scope: "reels 1-3", reason: "no paying 3-of-a-kind on reels 1-3 => zero win, no tumble" }]);
   const mean2 = r.ev;
   let result;
   switch (query.type) {
@@ -3459,31 +3793,33 @@ function cascadeAnswer(query, r) {
   return { plan: p, result };
 }
 function holdWinAnswer(query, r) {
-  const p = plan(query, "MARKOV", "HOLD feature: (locked mask, respins)", "coin values enter linearly; locked-mask x respins Markov chain solved by popcount order; base lines by exact column DP", [`states=${r.states}`, `transitionTerms=${r.transitionTerms}`, `ms=${r.ms.toFixed(0)}`, r.method, "feature part float64 exact enumeration (no sampling)"], [{ kind: "LINEARITY", scope: "HOLD", variable: "locked coin values", reason: "payout additive in locked values; landing law independent of values" }]);
+  const p = mkPlan(query, "MARKOV", "maskMarkov", "HOLD feature: (locked mask, respins)", "CellMask(coin) \xD7 CounterStep(respinReset) Markov chain by popcount order; Pay(maskSum+grand) by linearity; base lines by column DP", [`states=${r.states}`, `transitionTerms=${r.transitionTerms}`, `ms=${r.ms.toFixed(0)}`, r.method, "feature part float64 exact enumeration (no sampling)"], [{ kind: "LINEARITY", scope: "HOLD", variable: "locked coin values", reason: "payout additive in locked values; landing law independent of values" }]);
   const bet = query.type === "RTP" ? query.bet ?? r.bet : r.bet;
   const result = { ev: r.ev, rtp: r.ev / Number(bet), bet, exact: true, method: r.method, lineEV: r.lineEV, featureEV: r.featureEV, featureTriggerProbability: r.featureTriggerProbability, details: r };
   return { plan: p, result };
 }
 function stickyAnswer(query, r) {
-  const p = plan(query, "MARKOV", "FREE_SPINS: (sticky wild mask, spins left)", "spin pay additive with continuation: per-line marginals given sticky mask + per-column mask transition; integer-scaled exact Rational", [`reachableMasks=${r.reachableMasks}`, `states=${r.states}`, `ms=${r.ms.toFixed(0)}`, r.method], [{ kind: "LINEARITY", scope: "FREE_SPINS", variable: "line pay", reason: "E[pay+V(next)]=E[pay|mask]+E[V(next)|mask]" }]);
+  const p = mkPlan(query, "MARKOV", "regen(maskMarkov)", "FREE_SPINS: (sticky wild mask, spins left)", "CellMask(stickyWild) \xD7 CounterStep(stepDown) Markov chain; per-line Pay given mask; base trigger law (tagCount) outer; integer-scaled exact Rational", [`reachableMasks=${r.reachableMasks}`, `states=${r.states}`, `ms=${r.ms.toFixed(0)}`, r.method], [{ kind: "LINEARITY", scope: "FREE_SPINS", variable: "line pay", reason: "E[pay+V(next)]=E[pay|mask]+E[V(next)|mask]" }]);
   const bet = query.type === "RTP" ? query.bet ?? r.bet : r.bet;
   const result = { ev: r.ev, baseEV: r.baseLineEV, featureEV: r.featureEV, featureTriggerProbability: r.featureTriggerProbability, featureEVGivenTrigger: r.featureEVGivenTrigger, expectedFeatureSpins: null, bet, rtp: r.ev.div(new Rational(bet)), exact: true, method: r.method, details: r };
   return { plan: p, result };
 }
-
-// ../dist/src/math/queryEngine.js
-function solve(def, query, options = {}) {
-  const execution = buildExecutionPlan(def, query, { pgfZ: options.pgfZ, maxStates: options.maxStates, mcSamples: options.mcSamples, lowering: options.lowering, handlers: options.handlers, reelObservations: options.reelObservations, solverCapabilities: options.solverCapabilities, compiledQuery: options.compiledQuery });
-  if (!execution.math.exact) {
-    const mech = solveMechanicExact(def, query, { lowering: options.lowering, handlers: options.handlers, reelObservations: options.reelObservations });
-    if (mech)
-      return { query, plan: mech.plan, result: mech.result };
-  }
-  const result = executeBackend({ def, query, execution, options });
-  return { query, plan: execution.math, result };
+function composedAnswer(query, r) {
+  const fold = `regen(${r.base}+${r.inner})`;
+  const p = mkPlan(query, r.base === "stopEnum" ? "ENUM" : "MARKOV", fold, "paid round: base fold + FS entry", r.base === "stopEnum" ? "split FS trigger: stopEnum(base tumble chain) + P(scatter\u2265S on paid board)\xB7E[FS | entry] (composeRegen, linearity)" : "split FS trigger: joint column law (scatter count, coin mask) \u2192 FS has precedence over HOLD; maskMarkov(coin) V[mask] + P(FS)\xB7E[FS | entry]", [r.method, `ms=${r.ms.toFixed(0)}`, ...r.exactRational ? [] : ["feature part float64 exact enumeration (no sampling)"]], [{ kind: "LINEARITY", scope: "paid round", variable: "base pay + feature pay", reason: "EV(round)=EV(base)+\u03A3 P(entry)\xB7E[feature|entry]; feature starts from a fixed state" }]);
+  const bet = query.type === "RTP" ? query.bet ?? r.bet : r.bet;
+  const rtp = r.ev instanceof Rational ? r.ev.div(new Rational(bet)) : r.ev / Number(bet);
+  const result = { ev: r.ev, baseEV: r.baseEV, featureEV: r.featureEV, featureTriggerProbability: r.featureTriggerProbability, featureEVGivenTrigger: r.featureEVGivenTrigger, expectedFeatureSpins: null, bet, rtp, exact: true, method: r.method, details: r };
+  return { plan: p, result };
 }
 
-// ../dist/src/math/extensions.js
+// dist/src/math/queryEngine.js
+function solve(def, query, options = {}) {
+  const r = runPipeline(def, query, options);
+  return { query, plan: r.plan, result: r.result, fold: r.fold };
+}
+
+// dist/src/math/extensions.js
 var ENGINE_EXTENSION_API = { major: 1, minor: 1 };
 function compatible(r) {
   return r.major === ENGINE_EXTENSION_API.major && (r.minMinor ?? 0) <= ENGINE_EXTENSION_API.minor && (r.maxMinor ?? Number.MAX_SAFE_INTEGER) >= ENGINE_EXTENSION_API.minor;
@@ -3631,7 +3967,7 @@ function defineExtension(x) {
   return { ...x, compatibility: x.compatibility ?? { engineApi: { major: ENGINE_EXTENSION_API.major, minMinor: 0, maxMinor: ENGINE_EXTENSION_API.minor } } };
 }
 
-// ../dist/src/math/bundleManifest.js
+// dist/src/math/bundleManifest.js
 var ENGINE_CORE_VERSION = "0.36.0";
 var ENGINE_MATH_SEMANTICS = { id: "MATH_IR_V1", version: 1 };
 var ENGINE_RNG_SEMANTICS = { algorithm: "ADDRESS_HASH_V1", algorithmVersion: 1, addressingVersion: 1 };
@@ -3668,7 +4004,7 @@ function fingerprintEngineBundle(manifest) {
   return `sha256:${createHash("sha256").update(canonicalEngineBundleManifest(manifest)).digest("hex")}`;
 }
 
-// ../dist/src/math/engine.js
+// dist/src/math/engine.js
 function freezeRecord(x) {
   return Object.freeze(x);
 }
@@ -3705,7 +4041,7 @@ function createMathEngine(config = {}) {
   });
 }
 
-// ../dist/src/mechanics/slotMechanics.js
+// dist/src/mechanics/slotMechanics.js
 var isWild = (def, s, tag) => def.symbols[s]?.tags.includes(tag) ?? false;
 function expandWilds(def, board, wildTag = "WILD") {
   const wildByCol = Array.from({ length: board.cols }, (_, c2) => board.symbols.map((r) => r[c2]).find((s) => isWild(def, s, wildTag)));
@@ -3887,7 +4223,7 @@ var slotMechanicsExtension = defineExtension({
   nodeTypes: [{ kind: "HOLD_COINS", validate: (n) => n.kind === "HOLD_COINS" && typeof n.board === "string" && typeof n.stateKey === "string" && typeof n.output === "string" && typeof n.tag === "string" && typeof n.paytableId === "string", capabilities: (n) => holdCoins.capabilities(n), handler: holdCoins }]
 });
 
-// ../dist/src/builder/primitives.js
+// dist/src/builder/primitives.js
 var ref = (name) => ({ ref: name });
 var lit2 = (value) => ({ const: value });
 var ge = (left, right) => ({ op: ">=", left, right });
@@ -4005,7 +4341,7 @@ function freeSpinsModes(o) {
   return modes;
 }
 
-// ../dist/src/demo/slots/classic3Reel.js
+// dist/src/demo/slots/classic3Reel.js
 function classic3ReelDemo() {
   const paylines = lineMap([[1, 1, 1], [0, 0, 0], [2, 2, 2], [0, 1, 2], [2, 1, 0]]), ids = Object.keys(paylines);
   return game({
@@ -4041,7 +4377,7 @@ function classic3ReelDemo() {
   });
 }
 
-// ../dist/src/demo/slots/videoSlot20.js
+// dist/src/demo/slots/videoSlot20.js
 function videoSlot20Demo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   return game({
@@ -4083,7 +4419,7 @@ function videoSlot20Demo() {
   });
 }
 
-// ../dist/src/demo/slots/ways243.js
+// dist/src/demo/slots/ways243.js
 function ways243Demo() {
   const ids = [];
   return game({
@@ -4125,7 +4461,7 @@ function ways243Demo() {
   });
 }
 
-// ../dist/src/demo/slots/scatterPays.js
+// dist/src/demo/slots/scatterPays.js
 function scatterPaysDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   const scatterPay = (p, next) => ({
@@ -4175,7 +4511,7 @@ function scatterPaysDemo() {
   });
 }
 
-// ../dist/src/demo/slots/buyFreeSpins.js
+// dist/src/demo/slots/buyFreeSpins.js
 function buyFreeSpinsDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   return game({
@@ -4210,7 +4546,7 @@ function buyFreeSpinsDemo() {
   });
 }
 
-// ../dist/src/demo/slots/expandingWilds.js
+// dist/src/demo/slots/expandingWilds.js
 function expandingWildsDemo() {
   const paylines = lineMap(lines20.slice(0, 10)), ids = Object.keys(paylines);
   return game({
@@ -4252,7 +4588,7 @@ function expandingWildsDemo() {
   });
 }
 
-// ../dist/src/demo/slots/fishCollector.js
+// dist/src/demo/slots/fishCollector.js
 function fishCollectorDemo() {
   const paylines = lineMap(lines20.slice(0, 10)), ids = Object.keys(paylines);
   const collect2 = (p, next) => ({
@@ -4301,7 +4637,7 @@ function fishCollectorDemo() {
   });
 }
 
-// ../dist/src/demo/slots/cascades.js
+// dist/src/demo/slots/cascades.js
 function cascadesDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   const nodes2 = {
@@ -4340,7 +4676,7 @@ function cascadesDemo() {
   });
 }
 
-// ../dist/src/demo/slots/holdAndWin.js
+// dist/src/demo/slots/holdAndWin.js
 function holdAndWinDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   const base3 = {
@@ -4408,7 +4744,7 @@ function holdAndWinDemo() {
   });
 }
 
-// ../dist/src/demo/crash.js
+// dist/src/demo/crash.js
 var crashLadder = [10n, 15n, 20n, 30n, 50n, 100n];
 function crashDemo(cashoutRung = 3) {
   if (cashoutRung < 1 || cashoutRung >= crashLadder.length)
@@ -4437,7 +4773,7 @@ function crashDemo(cashoutRung = 3) {
   };
 }
 
-// ../dist/src/demo/plinko.js
+// dist/src/demo/plinko.js
 var plinkoBuckets = [400n, 80n, 20n, 80n, 400n];
 function plinkoDemo() {
   const rows = 4;
@@ -4471,7 +4807,7 @@ function plinkoDemo() {
   };
 }
 
-// ../dist/src/demo/slots/megaways.js
+// dist/src/demo/slots/megaways.js
 var pays = { H1: { 3: 10n, 4: 25n, 5: 50n, 6: 150n }, H2: { 3: 6n, 4: 15n, 5: 30n, 6: 80n }, H3: { 3: 4n, 4: 10n, 5: 20n, 6: 50n }, A: { 3: 2n, 4: 5n, 5: 10n, 6: 25n }, K: { 3: 2n, 4: 4n, 5: 8n, 6: 20n }, Q: { 3: 1n, 4: 3n, 5: 6n, 6: 15n }, J: { 3: 1n, 4: 2n, 5: 5n, 6: 10n } };
 var counts = (wild) => ({ H1: 2, H2: 3, H3: 4, A: 6, K: 6, Q: 7, J: 8, W: wild });
 function megaStrip(seed, wild, scale) {
@@ -4506,7 +4842,7 @@ function megawaysDemo(scale = 1, wild = 1) {
   });
 }
 
-// ../dist/src/demo/slots/stickyWilds.js
+// dist/src/demo/slots/stickyWilds.js
 var pays2 = {
   H1: { 2: 10n, 3: 105n, 4: 420n, 5: 2100n },
   H2: { 3: 63n, 4: 252n, 5: 1050n },
@@ -4560,7 +4896,7 @@ function stickyWildsDemo() {
   });
 }
 
-// ../dist/src/mechanics/stickyWild.js
+// dist/src/mechanics/stickyWild.js
 function apply(board, previous, wild) {
   const positions = new Set(Array.isArray(previous) ? previous : []);
   for (let row = 0; row < board.rows; row++)
@@ -4592,7 +4928,7 @@ var stickyWildExtension = defineExtension({ id: "mechanic.sticky-wild", version:
   handler
 }] });
 
-// ../dist/src/demo/instant/mines.js
+// dist/src/demo/instant/mines.js
 var binom = (n, k) => {
   let r = 1n;
   for (let i = 0; i < k; i++)
@@ -4630,7 +4966,7 @@ function minesDemo(mines = 3, picks = 5) {
   };
 }
 
-// ../dist/src/demo/instant/scratch.js
+// dist/src/demo/instant/scratch.js
 var scratchPrizes = [
   { id: "JACKPOT", name: "Jackpot 1000x", pay: 100000n, weight: 1n },
   { id: "P100", name: "Prize 100x", pay: 10000n, weight: 2n },
@@ -4676,7 +5012,7 @@ function scratchDemo(cells = 6) {
   };
 }
 
-// ../dist/src/demo/instant/dice.js
+// dist/src/demo/instant/dice.js
 function dicePay(winOutcomes) {
   return 9900n / BigInt(winOutcomes);
 }
@@ -4705,7 +5041,7 @@ function diceDemo(direction = "UNDER", target = 50) {
   };
 }
 
-// ../dist/src/demo/catalog.js
+// dist/src/demo/catalog.js
 var finite = ["EV", "HIT_RATE", "VARIANCE", "EXPECTED_DURATION", "DISTRIBUTION"];
 var slot = [slotMechanicsExtension];
 var demoCatalog = Object.freeze([
@@ -4737,7 +5073,44 @@ function solveDemo(id, query, options = {}) {
   return createMathEngine({ extensions: [...d.extensions] }).solve(d.definition(), { type: query }, options);
 }
 
-// core.mjs
+// dist/src/math/primitives/plan.js
+var PLAN_SCHEMA = "mginx.plan/1";
+var OPERATOR_FOLDS = {
+  cascade: { kind: "stopEnum", ladder: true },
+  holdWin: { kind: "maskMarkov", mask: "coin" },
+  stickyWild: { kind: "regen", inner: { kind: "maskMarkov", mask: "stickyWild" }, buyOnly: false, retrigger: false },
+  linesEnum: { kind: "columnDP", observe: ["lines"] },
+  waysDp: { kind: "columnDP", observe: ["ways"] },
+  freeSpins: { kind: "regen", inner: { kind: "columnDP", observe: ["lines"] }, buyOnly: false, retrigger: true },
+  dice: { kind: "graphExact" },
+  survivalChain: { kind: "graphExact" },
+  scratch: { kind: "graphExact" },
+  plinko: { kind: "graphExact" }
+};
+function foldSignature(f) {
+  switch (f.kind) {
+    case "columnDP":
+      return `columnDP`;
+    case "stopEnum":
+      return "stopEnum";
+    case "maskMarkov":
+      return `maskMarkov:${f.mask}`;
+    case "graphExact":
+      return "graphExact";
+    case "regen":
+      return `regen(${f.base ? foldSignature(f.base) + "+" : ""}${foldSignature(f.inner)})`;
+  }
+}
+function emitPlan(def, id, operator) {
+  const bet = Number(def.wager?.totalBet ?? 1n);
+  const opFold = OPERATOR_FOLDS[operator.kind] ?? null;
+  const spec = specialisedFold(def);
+  const fold = opFold && spec && foldSignature(spec) === foldSignature(opFold) ? spec : opFold;
+  const parallel = fold && (fold.kind === "stopEnum" || fold.kind === "columnDP" && operator.kind === "waysDp") ? "stopRange" : "none";
+  return { schema: PLAN_SCHEMA, id, bet, fold, operator, parallel };
+}
+
+// bench/core.mjs
 var num = (x) => x == null ? null : typeof x === "number" ? x : typeof x === "bigint" ? Number(x) : typeof x.toNumber === "function" ? x.toNumber() : Number(x);
 var demos = () => demoCatalog.map((d) => ({ id: d.id, title: d.title, tags: d.tags }));
 var now = () => performance.now();
@@ -4780,9 +5153,14 @@ var payTable = (def, pid, ids, cols) => {
   return pay;
 };
 var nodesOf = (def) => def.modes[def.entryModeId].nodes;
-function exportSpec(id) {
+function exportPlanDef(def, id, kind = id) {
+  const op = exportSpecDef(def, id, kind);
+  const { id: _i, bet: _b, ...operator } = op;
+  return emitPlan(def, id, operator);
+}
+function exportPlan(id) {
   const d = demoCatalog.find((x) => x.id === id);
-  return exportSpecDef(d.definition(), id, id);
+  return exportPlanDef(d.definition(), id, id);
 }
 function exportSpecDef(def, id, kind = id) {
   const bet = Number(def.wager?.totalBet ?? 1n);
@@ -4925,10 +5303,10 @@ function exportFreeSpins(def) {
   };
 }
 
-// web/worker.mjs
+// bench/web/worker.mjs
 import init, { solve as solve2, split_meta } from "./pkg/mginx_bench.js";
 
-// scripts/common.mjs
+// bench/scripts/common.mjs
 var median2 = (a) => {
   const s = [...a].sort((x, y) => x - y);
   return s[s.length >> 1];
@@ -4947,11 +5325,11 @@ function timeIt(fn, { runs = 5, longMs = 1500 } = {}) {
   return { ...r, ms: median2(ms), firstMs: first, runs, mode: `median${runs}` };
 }
 
-// web/worker.mjs
+// bench/web/worker.mjs
 var ready = init({ module_or_path: new URL("./pkg/mginx_bench_bg.wasm", self.location.href) });
 self.onmessage = async (e) => {
   if (e.data.specOf) {
-    const spec = JSON.stringify(exportSpec(e.data.specOf));
+    const spec = JSON.stringify(exportPlan(e.data.specOf));
     self.postMessage({ specOf: e.data.specOf, spec, n0: JSON.parse(split_meta(spec)).n0 });
     return;
   }
@@ -4959,11 +5337,11 @@ self.onmessage = async (e) => {
   await ready;
   let r;
   try {
-    r = engine === "ts" ? tsBench(id) : timeIt(() => JSON.parse(solve2(JSON.stringify(exportSpec(id)))));
+    r = engine === "ts" ? tsBench(id) : timeIt(() => JSON.parse(solve2(JSON.stringify(exportPlan(id)))));
   } catch (err) {
     r = { error: String(err?.message ?? err) };
   }
   self.postMessage({ id, engine, r });
 };
 await ready;
-self.postMessage({ demos: demos(), splittable: demos().map((d) => d.id).filter((id) => JSON.parse(split_meta(JSON.stringify(exportSpec(id)))).n0 > 0) });
+self.postMessage({ demos: demos(), splittable: demos().map((d) => d.id).filter((id) => JSON.parse(split_meta(JSON.stringify(exportPlan(id)))).n0 > 0) });
