@@ -4782,7 +4782,9 @@ var payTable = (def, pid, ids, cols) => {
 var nodesOf = (def) => def.modes[def.entryModeId].nodes;
 function exportSpec(id) {
   const d = demoCatalog.find((x) => x.id === id);
-  const def = d.definition();
+  return exportSpecDef(d.definition(), id, id);
+}
+function exportSpecDef(def, id, kind = id) {
   const bet = Number(def.wager?.totalBet ?? 1n);
   const base3 = { id, bet };
   const T = compileCascade(def);
@@ -4847,25 +4849,25 @@ function exportSpec(id) {
         return { ...base3, kind: "waysDp", rows: Number(spin2.source.rows), cols, nSym: ids.length, reels, wild, paying, pay: payTable(def, ev.paytableId, ids, cols) };
       }
     }
-    if (id === "dice") {
+    if (kind === "dice") {
       const r = nodes2.roll, c2 = nodes2.check;
       return { ...base3, kind: "dice", outcomes: r.source.outcomes.map((o) => Number(o.weight)), op: c2.expression.op, target: Number(c2.expression.right.const), pay: Number(nodes2.pay.amount.const) };
     }
-    if (id === "crash" || id === "mines") {
+    if (kind === "crash" || kind === "mines") {
       const steps2 = all.filter((n) => n.source?.type === "WEIGHTED_CHOICE").map((n) => {
         const w = n.source.outcomes.map((o) => Number(o.weight));
         return [w[0], w.reduce((a, b) => a + b, 0)];
       });
       return { ...base3, kind: "survivalChain", steps: steps2, pay: Number(nodes2.cashout.amount.const) };
     }
-    if (id === "scratch") {
+    if (kind === "scratch") {
       const src = all.find((n) => n.source?.type === "WEIGHTED_CHOICE");
       const cells = all.filter((n) => /^cell\d+$/.test(n.id)).length;
       const order = src.source.outcomes.map((o) => o.value);
       const pays3 = order.map((s) => Number(def.paytables.ticket.pays[s][3]));
       return { ...base3, kind: "scratch", cells, need: 3, weights: src.source.outcomes.map((o) => Number(o.weight)), pays: pays3 };
     }
-    if (id === "plinko") {
+    if (kind === "plinko") {
       const rows = Number(nodes2.landed.expression.right.const);
       const buckets = all.filter((n) => /^payB\d+$/.test(n.id)).sort((a, b) => a.id.localeCompare(b.id)).map((n) => Number(n.amount.const));
       const w = nodes2.peg.source.outcomes.map((o) => Number(o.weight));
