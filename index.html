@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><title>mginx: TS vs Rust/WASM in the browser</title>
+<style>body{font:14px system-ui;margin:20px}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:4px 8px;text-align:right}td:first-child,th:first-child{text-align:left}.np{color:#999}button{margin:2px}</style></head><body>
+<h2>Расчёт демо в браузере: TypeScript vs Rust→WASM</h2>
+<p>Всё считается локально в Web Worker. Время = <code>performance.now()</code>: прогрев + медиана 5 прогонов, длинные расчёты — один полный прогон. В таблице каскады — один поток. Ниже — многопоточный WASM: N Web Worker'ов, у каждого свой экземпляр WASM, очередь по stop[0] барабана 1.</p>
+<p><b>Каскады, WASM многопоточно:</b> workers <input id="nw" type="number" min="1" style="width:4em"> <button id="mt">Run</button> <span id="mtr"></span></p>
+<button id="all">Run all (TS + WASM)</button> <button id="allw">Run all WASM only</button> <span id="st"></span>
+<table id="t"><thead><tr><th>Demo</th><th>TS ms</th><th>TS RTP</th><th>WASM ms</th><th>WASM RTP</th><th></th></tr></thead><tbody></tbody></table>
+<script type="module">
+const w=new Worker("./dist/worker.js",{type:"module"});const tb=document.querySelector("#t tbody");let list=[];const pend=new Map();window.__results={ts:{},wasm:{}};
+const fmt=r=>!r?"":r.error?"ERR":r.notPorted?'<span class="np">not ported</span>':r.ms.toFixed(r.ms<10?3:1);
+const rtp=r=>r&&r.rtp!=null?(100*r.rtp).toFixed(4)+"%":"";
+const call=(id,engine)=>new Promise(res=>{pend.set(id+engine,res);w.postMessage({id,engine});});
+w.onmessage=e=>{if(e.data.cascadeSpec){pend.get("spec")?.(e.data.cascadeSpec);return;}if(e.data.demos){list=e.data.demos;for(const d of list){const tr=document.createElement("tr");tr.id="r_"+d.id;tr.innerHTML=`<td title="${d.id}">${d.title}</td><td></td><td></td><td></td><td></td><td><button>TS</button><button>WASM</button></td>`;tb.append(tr);
+  const [a,b]=tr.querySelectorAll("button");a.onclick=()=>run(d.id,"ts");b.onclick=()=>run(d.id,"wasm");}window.__ready=true;return;}
+  const {id,engine,r}=e.data;window.__results[engine][id]=r;const tds=document.querySelectorAll(`#r_${id} td`);const o=engine==="ts"?1:3;tds[o].innerHTML=fmt(r);tds[o+1].textContent=rtp(r);pend.get(id+engine)?.(r);};
+async function run(id,engine){document.querySelector("#st").textContent=`running ${engine} ${id}…`;await call(id,engine);document.querySelector("#st").textContent="";}
+async function runAll(engines){for(const d of list)for(const en of engines)await run(d.id,en);window.__done=true;document.querySelector("#st").textContent="done";}
+document.querySelector("#all").onclick=()=>runAll(["wasm","ts"]);document.querySelector("#allw").onclick=()=>runAll(["wasm"]);window.runAll=runAll;
+const nw=document.querySelector("#nw");nw.value=navigator.hardwareConcurrency||4;
+async function runCascadeMT(N=+nw.value){const spec=await new Promise(r=>{pend.set("spec",r);w.postMessage({cascadeSpec:true});});const {n0,total}=JSON.parse(spec.length&&await metaOf(spec));
+  const ws=await Promise.all(Array.from({length:N},()=>new Promise(r=>{const x=new Worker("./dist/cascade-worker.js",{type:"module"});x.onmessage=()=>r(x);x.postMessage({spec});})));
+  document.querySelector("#mtr").textContent="running…";const t0=performance.now();let next=0,sum=0;
+  await Promise.all(ws.map(x=>new Promise(res=>{const go=()=>{if(next>=n0)return res();x.postMessage({i:next++});};x.onmessage=e=>{sum+=e.data.v;go();};go();})));
+  const ms=performance.now()-t0,ev=sum/total;ws.forEach(x=>x.terminate());const spj=JSON.parse(spec);const r={ms,ev,rtp:ev/spj.bet,workers:N,mode:"single",method:"N Web Workers x own WASM instance"};
+  window.__results.wasm["cascades@threads"]=r;document.querySelector("#mtr").textContent=`${N} workers: ${ms.toFixed(0)} ms, RTP ${(100*r.rtp).toFixed(4)}%`;return r;}
+async function metaOf(spec){const m=await import("./dist/pkg/mginx_bench.js");await m.default(new URL("./dist/pkg/mginx_bench_bg.wasm",location.href));return m.cascade_meta(spec);}
+document.querySelector("#mt").onclick=()=>runCascadeMT();window.runCascadeMT=runCascadeMT;
+</script></body></html>
