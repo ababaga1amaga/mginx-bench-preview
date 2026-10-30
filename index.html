@@ -6,8 +6,8 @@ td.l,th.l{text-align:left}tr.run td{background:#fffbe6}.ok{color:#080}.warn{colo
 <h2>mginx: точный расчёт в WASM vs замороженный Monte Carlo</h2>
 <p>Механика: <select id="mech"></select> <button id="go">Посчитать все</button> <span id="st"></span></p>
 <p class="dim" id="mcinfo"></p>
-<div class="wrap"><table><thead><tr><th>#</th><th class="l">Вариация / конфигурация</th><th class="l">ядро</th><th>MC RTP ±σ</th><th>MC EV</th><th>WASM RTP</th><th>WASM EV</th><th>Δ/σ</th><th>WASM ms</th><th class="l">заметки</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
-<p class="dim">MC посчитан офлайн TS-движком (simulate) и вшит в страницу; WASM считает точное матожидание здесь, в браузере. Δ/σ = (WASM−MC)/σ<sub>MC</sub>, |Δ/σ|&lt;3 — совпадение в пределах шума. Каскады и megaways параллелятся по стопам 1-го барабана на все потоки; лёгкие ядра идут по одному варианту на поток параллельно. <a href="./compare.html">старое сравнение TS vs WASM</a></p>
+<div class="wrap"><table><thead><tr><th>#</th><th class="l">Вариация / конфигурация</th><th class="l">ядро</th><th>MC RTP % @100k</th><th>@200k</th><th>@400k</th><th>@800k</th><th>@1M ±σ</th><th>WASM RTP %</th><th>WASM EV</th><th>Δ/σ</th><th>WASM ms</th><th class="l">заметки</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+<p class="dim">MC посчитан офлайн TS-движком (simulate) и вшит в страницу; WASM считает точное матожидание здесь, в браузере. Колонки MC — срезы одного непрерывного прогона 1&nbsp;000&nbsp;000 раундов (тот же seed) на 100k/200k/400k/800k/1M; σ падает как 1/√N. После «Посчитать» под каждым срезом — отклонение MC от точного WASM в п.п. RTP, цвет — по |Δ|/σ этого среза (зелёный &lt;2σ, жёлтый &lt;3σ, красный ≥3σ). Δ/σ = (WASM−MC@1M)/σ<sub>MC@1M</sub>. Варианты с пометкой «подстройка RTP» перенастроены (масштаб выплат и/или ставка) так, чтобы точный RTP был ≈96%. Каскады и megaways параллелятся по стопам 1-го барабана на все потоки; лёгкие ядра идут по одному варианту на поток параллельно. <a href="./compare.html">старое сравнение TS vs WASM</a></p>
 <script type="module">
 const $=id=>document.getElementById(id);const N0=navigator.hardwareConcurrency||4;
 const data=await (await fetch("./dist/variants.json")).json();
@@ -20,10 +20,13 @@ async function getPool(n){if(poolN===n)return pool;pool.forEach(w=>w.terminate()
 const ask=(w,msg)=>new Promise(r=>{w.onmessage=e=>r(e.data);w.postMessage(msg);});
 async function runSplit(ws,spec,n0){await Promise.all(ws.map(x=>ask(x,{spec})));const t=performance.now();let next=0,ev=0;
   await Promise.all(ws.map(x=>new Promise(res=>{const go=()=>{if(next>=n0)return res();x.postMessage({i:next++});};x.onmessage=e=>{ev+=e.data.v;go();};go();})));return {ev,ms:performance.now()-t,threads:Math.min(ws.length,n0)};}
-function row(v,i){const tr=document.createElement("tr");tr.id="r"+v.id;const mc=v.mc;
-  tr.innerHTML=`<td>${i+1}</td><td class="l">${v.label}<div class="dim">${v.base}, ставка ${v.bet}</div></td><td class="l">${v.kind}</td><td>${f(mc.rtp)} <span class="dim">±${f(mc.rtpSe)}</span></td><td>${f(mc.ev,3)}</td><td class="w">—</td><td class="e">—</td><td class="z">—</td><td class="ms">—</td><td class="l n dim">MC ${mc.samples/1000}k, seed ${mc.seed}, hit ${f(mc.hitRate*100,1)}%${mc.featureRate?`, фича ${f(mc.featureRate*100,2)}%`:""}</td><td><button class="one">Посчитать</button></td>`;tr.querySelector(".one").onclick=()=>run([v]);return tr;}
+const sl=v=>v.mc.slices?.length?v.mc.slices:[{n:v.mc.samples,ev:v.mc.ev,rtp:v.mc.rtp,se:v.mc.se,rtpSe:v.mc.rtpSe}];
+function row(v,i){const tr=document.createElement("tr");tr.id="r"+v.id;const mc=v.mc;const S=sl(v);
+  const cells=S.map((s,k)=>`<td class="s" data-k="${k}">${f(s.rtp*100,2)}${k===S.length-1?` <span class="dim">±${f(s.rtpSe*100,2)}</span>`:""}<div class="dim d"></div></td>`).join("");
+  tr.innerHTML=`<td>${i+1}</td><td class="l">${v.label}<div class="dim">${v.base}, ставка ${v.bet}</div></td><td class="l">${v.kind}</td>${cells}<td class="w">—</td><td class="e">—</td><td class="z">—</td><td class="ms">—</td><td class="l n dim">MC ${mc.samples/1000}k, seed ${mc.seed}, EV ${f(mc.ev,3)}, hit ${f(mc.hitRate*100,1)}%${mc.featureRate?`, фича ${f(mc.featureRate*100,2)}%`:""}</td><td><button class="one">Посчитать</button></td>`;tr.querySelector(".one").onclick=()=>run([v]);return tr;}
 function fill(v,r){const tr=$("r"+v.id);const z=(r.ev-v.mc.ev)/v.mc.se;tr.classList.remove("run");
-  tr.querySelector(".w").textContent=f(r.ev/v.bet);tr.querySelector(".e").textContent=f(r.ev,3);
+  tr.querySelector(".w").textContent=f(r.ev/v.bet*100,2);
+  sl(v).forEach((x,k)=>{const c=tr.querySelector(`td.s[data-k="${k}"]`);const d=(x.rtp-r.ev/v.bet)*100,zz=Math.abs(d/(x.rtpSe*100));c.className="s "+(zz<2?"ok":zz<3?"warn":"bad");c.querySelector(".d").textContent=`Δ ${d>=0?"+":""}${d.toFixed(2)} (${zz.toFixed(1)}σ)`;});tr.querySelector(".e").textContent=f(r.ev,3);
   const zc=tr.querySelector(".z");zc.textContent=f(z,2);zc.className="z "+(Math.abs(z)<2?"ok":Math.abs(z)<3?"warn":"bad");
   tr.querySelector(".ms").textContent=r.ms<10?r.ms.toFixed(2):r.ms.toFixed(0);const nc=tr.querySelector(".n");nc.dataset.b??=nc.textContent;nc.textContent=nc.dataset.b+(r.threads>1?` · WASM MT ×${r.threads}`:" · WASM 1 поток");}
 let gen=0;

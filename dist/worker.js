@@ -1,4 +1,4 @@
-// node_modules/@noble/hashes/_u64.js
+// ../node_modules/@noble/hashes/_u64.js
 var fromNumH = (n) => n / 2 ** 32 | 0;
 var fromNumL = (n) => n >>> 0;
 function setU64FromNum(view, byteOffset, n, isLE) {
@@ -8,7 +8,7 @@ function setU64FromNum(view, byteOffset, n, isLE) {
   view.setUint32(byteOffset + 4, isLE ? h : l, isLE);
 }
 
-// node_modules/@noble/hashes/utils.js
+// ../node_modules/@noble/hashes/utils.js
 function isBytes(a) {
   return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array" && "BYTES_PER_ELEMENT" in a && a.BYTES_PER_ELEMENT === 1;
 }
@@ -95,7 +95,7 @@ var oidNist = (suffix) => ({
   oid: Uint8Array.from([6, 9, 96, 134, 72, 1, 101, 3, 4, 2, suffix])
 });
 
-// node_modules/@noble/hashes/_md.js
+// ../node_modules/@noble/hashes/_md.js
 function Chi(a, b, c2) {
   return a & b ^ ~a & c2;
 }
@@ -208,7 +208,7 @@ var SHA256_IV = /* @__PURE__ */ Uint32Array.from([
   1541459225
 ]);
 
-// node_modules/@noble/hashes/sha2.js
+// ../node_modules/@noble/hashes/sha2.js
 var SHA256_K = /* @__PURE__ */ Uint32Array.from([
   1116352408,
   1899447441,
@@ -373,7 +373,7 @@ var sha256 = /* @__PURE__ */ createHasher(
   /* @__PURE__ */ oidNist(1)
 );
 
-// bench/web/shims/crypto.js
+// web/shims/crypto.js
 var hex = (b) => Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
 function createHash(name) {
   if (name !== "sha256") throw new Error("shim: only sha256");
@@ -402,7 +402,7 @@ function createHash(name) {
   };
 }
 
-// dist/src/runtime/rng.js
+// ../dist/src/runtime/rng.js
 function uint64(a) {
   const s = [a.seed, a.modeId, a.nodeId, a.invocation, a.index].map(String).join("");
   const b = createHash("sha256").update(s).digest();
@@ -421,7 +421,7 @@ function weightedIndex(weights, a) {
   throw new Error("unreachable");
 }
 
-// dist/src/math/nodeHandlers.js
+// ../dist/src/math/nodeHandlers.js
 function refs(e, out = /* @__PURE__ */ new Set()) {
   if (!e || typeof e !== "object")
     return out;
@@ -555,7 +555,7 @@ var builtinNodeHandlers = {
   FLOW: { kind: "FLOW", capabilities: (n) => ({ ...base(), mayTransitionMode: n.operation.type === "ENTER_MODE" }), runtime: (c2) => c2.node.operation.type === "END_GAME" ? { terminal: true, payload: "END_GAME" } : { modeId: c2.node.operation.modeId }, exact: (c2) => c2.node.operation.type === "END_GAME" ? { terminal: true } : { modeId: c2.node.operation.modeId, clearFrame: true } }
 };
 
-// dist/src/math/evaluators.js
+// ../dist/src/math/evaluators.js
 function evaluatePaylines(def, board, paytableId, lineIds, wildTag = "WILD") {
   const pt = def.paytables[paytableId], out = [];
   for (const lineId of lineIds) {
@@ -604,7 +604,7 @@ var builtinEvaluatorHandlers = Object.freeze({
   }
 });
 
-// dist/src/runtime/executor.js
+// ../dist/src/runtime/executor.js
 function play(def, seed, opts = {}) {
   let state = { currentModeId: def.entryModeId, totalAward: 0n, values: {}, step: 0n };
   const frame = /* @__PURE__ */ new Map(), trace = [], inv = /* @__PURE__ */ new Map(), handlers = opts.handlers ?? builtinNodeHandlers, evaluators = opts.evaluators ?? builtinEvaluatorHandlers;
@@ -641,7 +641,7 @@ function play(def, seed, opts = {}) {
   throw new Error("execution guard exceeded");
 }
 
-// dist/src/math/queryCompiler.js
+// ../dist/src/math/queryCompiler.js
 function compileMathQuery(query, opts = {}) {
   switch (query.type) {
     case "EV":
@@ -661,7 +661,7 @@ function compileMathQuery(query, opts = {}) {
   throw new Error(`unregistered query type: ${query.type}`);
 }
 
-// dist/src/core/rational.js
+// ../dist/src/core/rational.js
 var Rational = class _Rational {
   n;
   d;
@@ -707,7 +707,7 @@ function gcd(a, b) {
   return a || 1n;
 }
 
-// dist/src/math/exactReels.js
+// ../dist/src/math/exactReels.js
 var ZERO = new Rational(0n);
 var ONE = new Rational(1n);
 function addTo(m, k, v) {
@@ -998,7 +998,7 @@ function exactSpinPayoutTriggerDistribution(def, reelSetId, paytableId, paylineI
   return [...grouped.values()].sort((a, b) => a.payout < b.payout ? -1 : a.payout > b.payout ? 1 : Number(a.trigger) - Number(b.trigger)).map((x) => ({ payout: x.payout, trigger: x.trigger, probability: new Rational(x.ways, denominator) }));
 }
 
-// dist/src/math/markov.js
+// ../dist/src/math/markov.js
 function solveRegenerative(meanReward, expectedOffspring) {
   if (expectedOffspring.n >= expectedOffspring.d)
     throw new Error(`non-terminating/divergent regenerative process: offspring=${expectedOffspring}`);
@@ -1007,7 +1007,7 @@ function solveRegenerative(meanReward, expectedOffspring) {
   return { expectedVisits: inv, expectedReward: meanReward.mul(inv) };
 }
 
-// dist/src/math/invariants.js
+// ../dist/src/math/invariants.js
 function refs2(e, out = /* @__PURE__ */ new Set()) {
   if ("ref" in e)
     out.add(e.ref);
@@ -1117,7 +1117,7 @@ function hasAdditiveRegenerativeCounter(def, modeId) {
   return terminationUses === 1;
 }
 
-// dist/src/math/solverRegistry.js
+// ../dist/src/math/solverRegistry.js
 var solverCapabilityRegistry = [
   { id: "symbolic-pgf", solver: "HYBRID", exact: true, requirements: ["PGF"], cyclic: true, partitioned: false, priority: 100 },
   { id: "regenerative", solver: "HYBRID", exact: true, requirements: ["REWARD", "DURATION", "ZERO_WIN", "PGF"], cyclic: true, partitioned: false, priority: 90 },
@@ -1172,7 +1172,7 @@ function selectSolverCapability(def, q, registry = solverCapabilityRegistry) {
   return { capability, reason: `${capability.id} satisfies ${q.backend}${cyclic ? " on cyclic graph" : " on acyclic graph"}${regenerative ? " with recognized regenerative quotient" : ""}` };
 }
 
-// dist/src/math/planner.js
+// ../dist/src/math/planner.js
 function exprRefs(e, out = /* @__PURE__ */ new Set()) {
   if ("ref" in e)
     out.add(e.ref);
@@ -1256,7 +1256,7 @@ function planMathQuery(def, query, options = {}) {
   return { query, solver: selected.capability.solver, exact: selected.capability.exact, observables: cq.observables.length ? [...cq.observables] : cq.backend === "PGF" ? ["P(totalAward=x)"] : cq.backend === "ENTRY_PROBABILITY" && query.type === "FEATURE_FREQUENCY" ? [`entered:${query.modeId}`] : [], livePersistentState: [...deps].sort(), syntheticState: syntheticFor(query), reductions, stages, diagnostics, estimatedSourceOutcomes: estimates };
 }
 
-// dist/src/math/stateGraph.js
+// ../dist/src/math/stateGraph.js
 var StateSpaceLimitError = class extends Error {
   limit;
   discovered;
@@ -1317,7 +1317,7 @@ function buildReachableStateGraph(args) {
   return { initialState: initialKey, states };
 }
 
-// dist/src/math/capabilities.js
+// ../dist/src/math/capabilities.js
 function analyzeCapabilities(def, handlers = builtinNodeHandlers) {
   const nodes2 = {}, unsupported = [];
   for (const [mid, m] of Object.entries(def.modes))
@@ -1339,7 +1339,7 @@ function analyzeCapabilities(def, handlers = builtinNodeHandlers) {
   return { nodes: nodes2, exactCompatible: unsupported.length === 0, unsupported };
 }
 
-// dist/src/math/lowering.js
+// ../dist/src/math/lowering.js
 var MAX_RAW_REEL_BOARDS = 2e6;
 var RawReelBoardLimitError = class extends StateSpaceLimitError {
   rawReelBoards = true;
@@ -1396,7 +1396,7 @@ var builtinSourceLowerers = {
 };
 var builtinExactLowering = { sources: builtinSourceLowerers, evaluators: builtinEvaluatorHandlers };
 
-// dist/src/math/reelObservableDistribution.js
+// ../dist/src/math/reelObservableDistribution.js
 function exactReelObservableDistribution(def, reelSetId, rows, descriptors) {
   const reelSet = def.reelSets[reelSetId];
   if (!reelSet)
@@ -1443,7 +1443,7 @@ function exactReelObservableDistribution(def, reelSetId, rows, descriptors) {
   return [...atoms.values()];
 }
 
-// dist/src/math/sufficientProjection.js
+// ../dist/src/math/sufficientProjection.js
 function projectByDeterministicContinuation(args) {
   const grouped = /* @__PURE__ */ new Map();
   for (const atom of args.atoms) {
@@ -1460,7 +1460,7 @@ function projectByDeterministicContinuation(args) {
   return [...grouped.values()];
 }
 
-// dist/src/math/reelObservableRegistry.js
+// ../dist/src/math/reelObservableRegistry.js
 function lineStateKey(state) {
   return `${state.target}:${state.first}:${state.count}:${state.alive ? 1 : 0}`;
 }
@@ -1534,7 +1534,7 @@ function claimReelObservation(registry, ctx) {
   return type ? registry[type]?.(ctx) : void 0;
 }
 
-// dist/src/math/reelDependencyAnalysis.js
+// ../dist/src/math/reelDependencyAnalysis.js
 function references(value, names) {
   if (typeof value === "string")
     return names.has(value);
@@ -1639,7 +1639,7 @@ function analyzeReelProjectionPlan(def, b, registry = builtinReelObservationRegi
   return { reelSetId: spin2.source.reelSetId, rows: spin2.source.rows, descriptors, rawPayoutOutput, awardMultiplier: multiplier, continuationNodeId: n.id };
 }
 
-// dist/src/math/reelOutcomeAggregation.js
+// ../dist/src/math/reelOutcomeAggregation.js
 function tryExpandAggregatedReelBoundary(def, b, lowering, handlers, observations = builtinReelObservationRegistry()) {
   const plan2 = analyzeReelProjectionPlan(def, b, observations);
   if (!plan2)
@@ -1661,7 +1661,7 @@ function tryExpandAggregatedReelBoundary(def, b, lowering, handlers, observation
   return projected.map((x) => ({ state: x.state, probability: x.probability, reward: x.reward }));
 }
 
-// dist/src/math/eventGraphCompiler.js
+// ../dist/src/math/eventGraphCompiler.js
 function cloneState(s) {
   return { modeId: s.modeId, nodeId: s.nodeId, values: { ...s.values }, frame: { ...s.frame }, terminal: s.terminal };
 }
@@ -1774,7 +1774,7 @@ function compileEventGraphToStateIR(def, opts = {}) {
   } }), initialReward: start.reward };
 }
 
-// dist/src/math/costPlanner.js
+// ../dist/src/math/costPlanner.js
 var defaultSolverBudget = { maxStates: 1e5, mcSamples: 1e5 };
 function tryCompileStateGraph(def, budget = defaultSolverBudget, deps = {}) {
   try {
@@ -1787,7 +1787,7 @@ function tryCompileStateGraph(def, budget = defaultSolverBudget, deps = {}) {
   }
 }
 
-// dist/src/math/executionPlanner.js
+// ../dist/src/math/executionPlanner.js
 function buildExecutionPlan(def, query, o = {}) {
   const queryIR = o.compiledQuery ?? compileMathQuery(query, { pgfZ: o.pgfZ });
   let math = planMathQuery(def, query, { compiled: queryIR, solverCapabilities: o.solverCapabilities });
@@ -1817,7 +1817,7 @@ function buildExecutionPlan(def, query, o = {}) {
   return { math, queryIR, budget, decision: { kind: "MONTE_CARLO", reason: attempt.reason } };
 }
 
-// dist/src/math/compiler.js
+// ../dist/src/math/compiler.js
 function constantBigInt(e) {
   if ("const" in e && (typeof e.const === "bigint" || typeof e.const === "number"))
     return BigInt(e.const);
@@ -1948,7 +1948,7 @@ function compileMomentIR(def) {
   return { ...ev, spins };
 }
 
-// dist/src/math/solver.js
+// ../dist/src/math/solver.js
 function solveExpectedValueIR(ir) {
   const base3 = ir.spins[ir.entryModeId];
   if (!base3)
@@ -1967,7 +1967,7 @@ function solveExpectedValueIR(ir) {
   return { baseEV: base3.expectedReward, featureTriggerProbability: link.triggerProbability, featureEV, expectedFeatureSpins, totalEV: base3.expectedReward.add(link.triggerProbability.mul(featureEV)) };
 }
 
-// dist/src/math/moments.js
+// ../dist/src/math/moments.js
 var ZERO2 = new Rational(0n);
 var ONE2 = new Rational(1n);
 function solveRegenerativeMoments(x) {
@@ -1987,7 +1987,7 @@ function iidSumMoments(one, n) {
   return { mean: mean2, second: second2, variance: second2.sub(mean2.mul(mean2)) };
 }
 
-// dist/src/math/momentSolver.js
+// ../dist/src/math/momentSolver.js
 function solveMomentIR(ir) {
   const base3 = ir.spins[ir.entryModeId];
   if (!base3)
@@ -2009,7 +2009,7 @@ function solveMomentIR(ir) {
   return { mean: mean2, second: second2, variance: second2.sub(mean2.mul(mean2)), featureMean: totalFeature.mean, featureSecond: totalFeature.second };
 }
 
-// dist/src/math/hitRate.js
+// ../dist/src/math/hitRate.js
 function solveExactHitRate(def, tolerance = 1e-15, maxIterations = 1e4) {
   const ir = compileExpectedValueIR(def), link = ir.entryFeature;
   const lineIds = Object.keys(def.paylines);
@@ -2047,7 +2047,7 @@ function solveExactHitRate(def, tolerance = 1e-15, maxIterations = 1e4) {
   return { hitRate: 1 - miss, missRate: miss, featureZeroProbability: featureZero, fixedPointResidual: residual, iterations };
 }
 
-// dist/src/math/pgf.js
+// ../dist/src/math/pgf.js
 var Z = new Rational(0n);
 var O = new Rational(1n);
 function add(m, k, p) {
@@ -2112,7 +2112,7 @@ function evaluatePaidGamePGF(p, z, tolerance = 1e-14) {
   return { value: c2 + d * Math.pow(f.value, Number(p.initialFeatureSpins)), featureValue: f.value, residual: f.residual };
 }
 
-// dist/src/math/finiteMarkov.js
+// ../dist/src/math/finiteMarkov.js
 function solveLinear(a, b) {
   const n = a.length;
   const m = a.map((row, i) => [...row, b[i]]);
@@ -2173,7 +2173,7 @@ function solveFiniteMarkov(ir) {
   return { initial, byState, transientStates: n, terminalStates: terminals.length };
 }
 
-// dist/src/math/observableAlgebra.js
+// ../dist/src/math/observableAlgebra.js
 var mean = { name: "rewardMean", dependsOn: [], immediate: (c2) => c2.reward, continuationCoefficient: () => 1, cutContribution: (c2) => c2.cut?.rewardMean ?? 0 };
 var second = { name: "rewardSecond", dependsOn: ["rewardMean"], immediate: (c2) => c2.reward * c2.reward + 2 * c2.reward * (c2.future.rewardMean ?? c2.cut?.rewardMean ?? 0), continuationCoefficient: () => 1, cutContribution: (c2) => c2.cut?.rewardSecond ?? 0 };
 var steps = { name: "steps", dependsOn: [], immediate: () => 1, continuationCoefficient: () => 1, cutContribution: (c2) => c2.cut?.steps ?? 0 };
@@ -2208,7 +2208,7 @@ function observableAlgebra(names, extensions = {}) {
 }
 var fullBoundaryAlgebra = observableAlgebra(["rewardMean", "rewardSecond", "steps", "hitProbability", "pgf"]);
 
-// dist/src/math/hybrid.js
+// ../dist/src/math/hybrid.js
 function u01(seed, sample, step) {
   const b = createHash("sha256").update(`${seed}${sample}${step}`).digest();
   const x = b.readBigUInt64BE(0) >> 11n;
@@ -2333,7 +2333,7 @@ function solveHybridObservables(def, opts) {
   return solveHybridAlgebra(def, { ...opts, algebra: observableAlgebra(names, opts.observableComponents) });
 }
 
-// dist/src/math/monteCarlo.js
+// ../dist/src/math/monteCarlo.js
 function deriveSeed(master, index) {
   const b = createHash("sha256").update(`${master}${index}`).digest();
   return b.readBigUInt64BE(0);
@@ -2373,7 +2373,7 @@ function simulate(def, samples, masterSeed = 1n, handlers, evaluators) {
   return { samples, mean: mean2, variance: sum2 / samples - mean2 * mean2, hitRate: hits / samples, featureRate: features / samples, averageFeatureSpins: features ? featureSpins / features : 0, modes };
 }
 
-// dist/src/math/genericRegenerative.js
+// ../dist/src/math/genericRegenerative.js
 function c(e) {
   return "const" in e && (typeof e.const === "number" || typeof e.const === "bigint") ? BigInt(e.const) : void 0;
 }
@@ -2485,7 +2485,7 @@ function solveGenericRegenerative(def, opts = {}) {
   return result;
 }
 
-// dist/src/math/modeStatistics.js
+// ../dist/src/math/modeStatistics.js
 function solveModeStatistics(def, modeId, opts = {}) {
   if (!def.modes[modeId])
     throw new Error(`unknown mode ${modeId}`);
@@ -2522,7 +2522,7 @@ function solveModeReward(def, modeId, opts = {}) {
   return solveFiniteMarkov(graph).initial.expectedReward.add(new Rational(start.rewardByMode[modeId] ?? 0n));
 }
 
-// dist/src/math/statePGF.js
+// ../dist/src/math/statePGF.js
 function compileStatePGF(graph) {
   for (const state of Object.values(graph.states))
     for (const t of state.transitions) {
@@ -2579,7 +2579,7 @@ function evaluateStatePGF(p, z) {
   return { value, residual };
 }
 
-// dist/src/math/backendExecutors.js
+// ../dist/src/math/backendExecutors.js
 function isRegen(execution) {
   return execution.math.reductions.some((x) => x.kind === "ADDITIVE_REGENERATIVE_COUNTER");
 }
@@ -2729,17 +2729,17 @@ function executeBackend(ctx) {
   return executor(ctx);
 }
 
-// bench/web/shims/os.js
+// web/shims/os.js
 var os_default = { availableParallelism: () => 1, cpus: () => [{}] };
 
-// bench/web/shims/worker_threads.js
+// web/shims/worker_threads.js
 var Worker = class {
   constructor() {
     throw new Error("worker_threads not available in browser");
   }
 };
 
-// dist/src/math/cascadeExact.js
+// ../dist/src/math/cascadeExact.js
 var lit = (e, env) => {
   if (!e)
     return;
@@ -3028,7 +3028,7 @@ function solveCascadeExact(def, opts = {}) {
   return { ev, secondMoment: m2, variance: m2.sub(ev.mul(ev)), hitRate: new Rational(BigInt(m.hits), N), outcomes: N, evaluated: m.evaluated, maxPayout: BigInt(m.max), bet, rtp: ev.div(new Rational(bet)), workers: m.workers, ms: performance.now() - t0, method: "CASCADE_DENSE_STOP_ENUMERATION" };
 }
 
-// dist/src/math/holdWinExact.js
+// ../dist/src/math/holdWinExact.js
 function compileHoldWin(def) {
   const modes = Object.values(def.modes);
   if (modes.length !== 2)
@@ -3214,7 +3214,7 @@ function solveHoldWinExact(def, _opts = {}) {
   return { ev, rtp: ev / Number(bet), bet, lineEV: line, featureEV: evT, featureTriggerProbability: pT, featureEVGivenTrigger: evT / pT, coinsEVAtTrigger: coinT / pT, states: (FULL + 1) * S.respins, transitionTerms: terms, ms: performance.now() - t0, method: "HOLD_WIN_MASK_RESPIN_MARKOV" };
 }
 
-// dist/src/math/stickyWildExact.js
+// ../dist/src/math/stickyWildExact.js
 function compileStickyWild(def) {
   const base3 = def.modes[def.entryModeId];
   if (!base3 || Object.keys(def.modes).length !== 2)
@@ -3412,7 +3412,7 @@ function solveStickyWildExact(def) {
   return { ev, bet, rtp: ev.div(new Rational(bet)), baseLineEV: baseLine, featureEV, featureTriggerProbability: pT, featureEVGivenTrigger: fsEV, reachableMasks: seen.size, states: seen.size * S.spins, ms: performance.now() - t0, method: "STICKY_WILD_MASK_SPINS_MARKOV" };
 }
 
-// dist/src/math/mechanicExact.js
+// ../dist/src/math/mechanicExact.js
 var plan = (query, solver, scope, reason, diag, reductions) => ({ query, solver, exact: true, observables: [], livePersistentState: [], syntheticState: [], reductions, stages: [{ id: "mechanic-exact", solver, scope, reason }], diagnostics: diag, estimatedSourceOutcomes: {} });
 var mechanicExactQueries = { cascade: ["EV", "RTP", "VARIANCE", "HIT_RATE"], holdWin: ["EV", "RTP"], stickyWild: ["EV", "RTP"] };
 function solveMechanicExact(def, query, ctx = {}) {
@@ -3471,7 +3471,7 @@ function stickyAnswer(query, r) {
   return { plan: p, result };
 }
 
-// dist/src/math/queryEngine.js
+// ../dist/src/math/queryEngine.js
 function solve(def, query, options = {}) {
   const execution = buildExecutionPlan(def, query, { pgfZ: options.pgfZ, maxStates: options.maxStates, mcSamples: options.mcSamples, lowering: options.lowering, handlers: options.handlers, reelObservations: options.reelObservations, solverCapabilities: options.solverCapabilities, compiledQuery: options.compiledQuery });
   if (!execution.math.exact) {
@@ -3483,7 +3483,7 @@ function solve(def, query, options = {}) {
   return { query, plan: execution.math, result };
 }
 
-// dist/src/math/extensions.js
+// ../dist/src/math/extensions.js
 var ENGINE_EXTENSION_API = { major: 1, minor: 1 };
 function compatible(r) {
   return r.major === ENGINE_EXTENSION_API.major && (r.minMinor ?? 0) <= ENGINE_EXTENSION_API.minor && (r.maxMinor ?? Number.MAX_SAFE_INTEGER) >= ENGINE_EXTENSION_API.minor;
@@ -3631,7 +3631,7 @@ function defineExtension(x) {
   return { ...x, compatibility: x.compatibility ?? { engineApi: { major: ENGINE_EXTENSION_API.major, minMinor: 0, maxMinor: ENGINE_EXTENSION_API.minor } } };
 }
 
-// dist/src/math/bundleManifest.js
+// ../dist/src/math/bundleManifest.js
 var ENGINE_CORE_VERSION = "0.36.0";
 var ENGINE_MATH_SEMANTICS = { id: "MATH_IR_V1", version: 1 };
 var ENGINE_RNG_SEMANTICS = { algorithm: "ADDRESS_HASH_V1", algorithmVersion: 1, addressingVersion: 1 };
@@ -3668,7 +3668,7 @@ function fingerprintEngineBundle(manifest) {
   return `sha256:${createHash("sha256").update(canonicalEngineBundleManifest(manifest)).digest("hex")}`;
 }
 
-// dist/src/math/engine.js
+// ../dist/src/math/engine.js
 function freezeRecord(x) {
   return Object.freeze(x);
 }
@@ -3705,7 +3705,7 @@ function createMathEngine(config = {}) {
   });
 }
 
-// dist/src/mechanics/slotMechanics.js
+// ../dist/src/mechanics/slotMechanics.js
 var isWild = (def, s, tag) => def.symbols[s]?.tags.includes(tag) ?? false;
 function expandWilds(def, board, wildTag = "WILD") {
   const wildByCol = Array.from({ length: board.cols }, (_, c2) => board.symbols.map((r) => r[c2]).find((s) => isWild(def, s, wildTag)));
@@ -3887,7 +3887,7 @@ var slotMechanicsExtension = defineExtension({
   nodeTypes: [{ kind: "HOLD_COINS", validate: (n) => n.kind === "HOLD_COINS" && typeof n.board === "string" && typeof n.stateKey === "string" && typeof n.output === "string" && typeof n.tag === "string" && typeof n.paytableId === "string", capabilities: (n) => holdCoins.capabilities(n), handler: holdCoins }]
 });
 
-// dist/src/builder/primitives.js
+// ../dist/src/builder/primitives.js
 var ref = (name) => ({ ref: name });
 var lit2 = (value) => ({ const: value });
 var ge = (left, right) => ({ op: ">=", left, right });
@@ -4005,7 +4005,7 @@ function freeSpinsModes(o) {
   return modes;
 }
 
-// dist/src/demo/slots/classic3Reel.js
+// ../dist/src/demo/slots/classic3Reel.js
 function classic3ReelDemo() {
   const paylines = lineMap([[1, 1, 1], [0, 0, 0], [2, 2, 2], [0, 1, 2], [2, 1, 0]]), ids = Object.keys(paylines);
   return game({
@@ -4041,7 +4041,7 @@ function classic3ReelDemo() {
   });
 }
 
-// dist/src/demo/slots/videoSlot20.js
+// ../dist/src/demo/slots/videoSlot20.js
 function videoSlot20Demo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   return game({
@@ -4083,7 +4083,7 @@ function videoSlot20Demo() {
   });
 }
 
-// dist/src/demo/slots/ways243.js
+// ../dist/src/demo/slots/ways243.js
 function ways243Demo() {
   const ids = [];
   return game({
@@ -4125,7 +4125,7 @@ function ways243Demo() {
   });
 }
 
-// dist/src/demo/slots/scatterPays.js
+// ../dist/src/demo/slots/scatterPays.js
 function scatterPaysDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   const scatterPay = (p, next) => ({
@@ -4175,7 +4175,7 @@ function scatterPaysDemo() {
   });
 }
 
-// dist/src/demo/slots/buyFreeSpins.js
+// ../dist/src/demo/slots/buyFreeSpins.js
 function buyFreeSpinsDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   return game({
@@ -4210,7 +4210,7 @@ function buyFreeSpinsDemo() {
   });
 }
 
-// dist/src/demo/slots/expandingWilds.js
+// ../dist/src/demo/slots/expandingWilds.js
 function expandingWildsDemo() {
   const paylines = lineMap(lines20.slice(0, 10)), ids = Object.keys(paylines);
   return game({
@@ -4252,7 +4252,7 @@ function expandingWildsDemo() {
   });
 }
 
-// dist/src/demo/slots/fishCollector.js
+// ../dist/src/demo/slots/fishCollector.js
 function fishCollectorDemo() {
   const paylines = lineMap(lines20.slice(0, 10)), ids = Object.keys(paylines);
   const collect2 = (p, next) => ({
@@ -4301,7 +4301,7 @@ function fishCollectorDemo() {
   });
 }
 
-// dist/src/demo/slots/cascades.js
+// ../dist/src/demo/slots/cascades.js
 function cascadesDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   const nodes2 = {
@@ -4340,7 +4340,7 @@ function cascadesDemo() {
   });
 }
 
-// dist/src/demo/slots/holdAndWin.js
+// ../dist/src/demo/slots/holdAndWin.js
 function holdAndWinDemo() {
   const paylines = lineMap(lines20), ids = Object.keys(paylines);
   const base3 = {
@@ -4408,7 +4408,7 @@ function holdAndWinDemo() {
   });
 }
 
-// dist/src/demo/crash.js
+// ../dist/src/demo/crash.js
 var crashLadder = [10n, 15n, 20n, 30n, 50n, 100n];
 function crashDemo(cashoutRung = 3) {
   if (cashoutRung < 1 || cashoutRung >= crashLadder.length)
@@ -4437,7 +4437,7 @@ function crashDemo(cashoutRung = 3) {
   };
 }
 
-// dist/src/demo/plinko.js
+// ../dist/src/demo/plinko.js
 var plinkoBuckets = [400n, 80n, 20n, 80n, 400n];
 function plinkoDemo() {
   const rows = 4;
@@ -4471,7 +4471,7 @@ function plinkoDemo() {
   };
 }
 
-// dist/src/demo/slots/megaways.js
+// ../dist/src/demo/slots/megaways.js
 var pays = { H1: { 3: 10n, 4: 25n, 5: 50n, 6: 150n }, H2: { 3: 6n, 4: 15n, 5: 30n, 6: 80n }, H3: { 3: 4n, 4: 10n, 5: 20n, 6: 50n }, A: { 3: 2n, 4: 5n, 5: 10n, 6: 25n }, K: { 3: 2n, 4: 4n, 5: 8n, 6: 20n }, Q: { 3: 1n, 4: 3n, 5: 6n, 6: 15n }, J: { 3: 1n, 4: 2n, 5: 5n, 6: 10n } };
 var counts = (wild) => ({ H1: 2, H2: 3, H3: 4, A: 6, K: 6, Q: 7, J: 8, W: wild });
 function megaStrip(seed, wild, scale) {
@@ -4506,7 +4506,7 @@ function megawaysDemo(scale = 1, wild = 1) {
   });
 }
 
-// dist/src/demo/slots/stickyWilds.js
+// ../dist/src/demo/slots/stickyWilds.js
 var pays2 = {
   H1: { 2: 10n, 3: 105n, 4: 420n, 5: 2100n },
   H2: { 3: 63n, 4: 252n, 5: 1050n },
@@ -4560,7 +4560,7 @@ function stickyWildsDemo() {
   });
 }
 
-// dist/src/mechanics/stickyWild.js
+// ../dist/src/mechanics/stickyWild.js
 function apply(board, previous, wild) {
   const positions = new Set(Array.isArray(previous) ? previous : []);
   for (let row = 0; row < board.rows; row++)
@@ -4592,7 +4592,7 @@ var stickyWildExtension = defineExtension({ id: "mechanic.sticky-wild", version:
   handler
 }] });
 
-// dist/src/demo/instant/mines.js
+// ../dist/src/demo/instant/mines.js
 var binom = (n, k) => {
   let r = 1n;
   for (let i = 0; i < k; i++)
@@ -4630,7 +4630,7 @@ function minesDemo(mines = 3, picks = 5) {
   };
 }
 
-// dist/src/demo/instant/scratch.js
+// ../dist/src/demo/instant/scratch.js
 var scratchPrizes = [
   { id: "JACKPOT", name: "Jackpot 1000x", pay: 100000n, weight: 1n },
   { id: "P100", name: "Prize 100x", pay: 10000n, weight: 2n },
@@ -4676,7 +4676,7 @@ function scratchDemo(cells = 6) {
   };
 }
 
-// dist/src/demo/instant/dice.js
+// ../dist/src/demo/instant/dice.js
 function dicePay(winOutcomes) {
   return 9900n / BigInt(winOutcomes);
 }
@@ -4705,7 +4705,7 @@ function diceDemo(direction = "UNDER", target = 50) {
   };
 }
 
-// dist/src/demo/catalog.js
+// ../dist/src/demo/catalog.js
 var finite = ["EV", "HIT_RATE", "VARIANCE", "EXPECTED_DURATION", "DISTRIBUTION"];
 var slot = [slotMechanicsExtension];
 var demoCatalog = Object.freeze([
@@ -4737,7 +4737,7 @@ function solveDemo(id, query, options = {}) {
   return createMathEngine({ extensions: [...d.extensions] }).solve(d.definition(), { type: query }, options);
 }
 
-// bench/core.mjs
+// core.mjs
 var num = (x) => x == null ? null : typeof x === "number" ? x : typeof x === "bigint" ? Number(x) : typeof x.toNumber === "function" ? x.toNumber() : Number(x);
 var demos = () => demoCatalog.map((d) => ({ id: d.id, title: d.title, tags: d.tags }));
 var now = () => performance.now();
@@ -4925,10 +4925,10 @@ function exportFreeSpins(def) {
   };
 }
 
-// bench/web/worker.mjs
+// web/worker.mjs
 import init, { solve as solve2, split_meta } from "./pkg/mginx_bench.js";
 
-// bench/scripts/common.mjs
+// scripts/common.mjs
 var median2 = (a) => {
   const s = [...a].sort((x, y) => x - y);
   return s[s.length >> 1];
@@ -4947,7 +4947,7 @@ function timeIt(fn, { runs = 5, longMs = 1500 } = {}) {
   return { ...r, ms: median2(ms), firstMs: first, runs, mode: `median${runs}` };
 }
 
-// bench/web/worker.mjs
+// web/worker.mjs
 var ready = init({ module_or_path: new URL("./pkg/mginx_bench_bg.wasm", self.location.href) });
 self.onmessage = async (e) => {
   if (e.data.specOf) {
