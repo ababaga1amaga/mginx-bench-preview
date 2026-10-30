@@ -4924,7 +4924,7 @@ function exportFreeSpins(def) {
 }
 
 // bench/web/worker.mjs
-import init, { solve as solve2, cascade_meta } from "./pkg/mginx_bench.js";
+import init, { solve as solve2, split_meta } from "./pkg/mginx_bench.js";
 
 // bench/scripts/common.mjs
 var median2 = (a) => {
@@ -4946,10 +4946,11 @@ function timeIt(fn, { runs = 5, longMs = 1500 } = {}) {
 }
 
 // bench/web/worker.mjs
-var ready = init(new URL("./pkg/mginx_bench_bg.wasm", self.location.href));
+var ready = init({ module_or_path: new URL("./pkg/mginx_bench_bg.wasm", self.location.href) });
 self.onmessage = async (e) => {
-  if (e.data.cascadeSpec) {
-    self.postMessage({ cascadeSpec: JSON.stringify(exportSpec("cascades")) });
+  if (e.data.specOf) {
+    const spec = JSON.stringify(exportSpec(e.data.specOf));
+    self.postMessage({ specOf: e.data.specOf, spec, n0: JSON.parse(split_meta(spec)).n0 });
     return;
   }
   const { id, engine } = e.data;
@@ -4962,4 +4963,5 @@ self.onmessage = async (e) => {
   }
   self.postMessage({ id, engine, r });
 };
-self.postMessage({ demos: demos() });
+await ready;
+self.postMessage({ demos: demos(), splittable: demos().map((d) => d.id).filter((id) => JSON.parse(split_meta(JSON.stringify(exportSpec(id)))).n0 > 0) });

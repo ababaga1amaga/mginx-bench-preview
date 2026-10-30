@@ -10,6 +10,16 @@ export function cascade_range(spec: string, lo: number, hi: number): number;
 
 export function solve(spec: string): string;
 
+/**
+ * Generic range API for splittable kernels (cascade: reel-1 stops; waysDp/megaways: reel-1 stops). Returns the partial EV numerator / its own scale.
+ */
+export function solve_range(spec: string, lo: number, hi: number): number;
+
+/**
+ * {"n0": number of reel-1 stops} for splittable kinds, {"n0":0} otherwise.
+ */
+export function split_meta(spec: string): string;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
@@ -17,6 +27,8 @@ export interface InitOutput {
     readonly cascade_meta: (a: number, b: number) => [number, number];
     readonly cascade_range: (a: number, b: number, c: number, d: number) => number;
     readonly solve: (a: number, b: number) => [number, number];
+    readonly solve_range: (a: number, b: number, c: number, d: number) => number;
+    readonly split_meta: (a: number, b: number) => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

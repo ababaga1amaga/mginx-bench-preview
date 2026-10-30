@@ -53,6 +53,42 @@ export function solve(spec) {
         wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
     }
 }
+
+/**
+ * Generic range API for splittable kernels (cascade: reel-1 stops; waysDp/megaways: reel-1 stops). Returns the partial EV numerator / its own scale.
+ * @param {string} spec
+ * @param {number} lo
+ * @param {number} hi
+ * @returns {number}
+ */
+export function solve_range(spec, lo, hi) {
+    const val2 = +lo;
+    const val3 = +hi;
+    const ptr0 = passStringToWasm0(spec, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.solve_range(ptr0, len0, val2, val3);
+    return ret;
+}
+
+/**
+ * {"n0": number of reel-1 stops} for splittable kinds, {"n0":0} otherwise.
+ * @param {string} spec
+ * @returns {string}
+ */
+export function split_meta(spec) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passStringToWasm0(spec, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.split_meta(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
