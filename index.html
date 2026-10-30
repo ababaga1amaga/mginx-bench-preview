@@ -4,12 +4,12 @@
 td.l,th.l{text-align:left}tr.run td{background:#fffbe6}.ok{color:#080}.warn{color:#b60}.bad{color:#c00;font-weight:bold}.dim{color:#777;font-size:12px}
 .wrap{overflow-x:auto}select,button,input{font-size:15px;padding:4px}</style></head><body>
 <h2>mginx: точный расчёт в WASM vs замороженный Monte Carlo</h2>
-<p>Механика: <select id="mech"></select> потоков: <input id="nw" type="number" min="1" max="64" style="width:4em"> <button id="go">Пересчитать</button> <span id="st"></span></p>
+<p>Механика: <select id="mech"></select> <button id="go">Посчитать все</button> <span id="st"></span></p>
 <p class="dim" id="mcinfo"></p>
-<div class="wrap"><table><thead><tr><th>#</th><th class="l">Вариация / конфигурация</th><th class="l">ядро</th><th>MC RTP ±σ</th><th>MC EV</th><th>WASM RTP</th><th>WASM EV</th><th>Δ/σ</th><th>WASM ms</th><th class="l">заметки</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="wrap"><table><thead><tr><th>#</th><th class="l">Вариация / конфигурация</th><th class="l">ядро</th><th>MC RTP ±σ</th><th>MC EV</th><th>WASM RTP</th><th>WASM EV</th><th>Δ/σ</th><th>WASM ms</th><th class="l">заметки</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
 <p class="dim">MC посчитан офлайн TS-движком (simulate) и вшит в страницу; WASM считает точное матожидание здесь, в браузере. Δ/σ = (WASM−MC)/σ<sub>MC</sub>, |Δ/σ|&lt;3 — совпадение в пределах шума. Каскады и megaways параллелятся по стопам 1-го барабана на все потоки; лёгкие ядра идут по одному варианту на поток параллельно. <a href="./compare.html">старое сравнение TS vs WASM</a></p>
 <script type="module">
-const $=id=>document.getElementById(id);const N0=navigator.hardwareConcurrency||4;$("nw").value=N0;
+const $=id=>document.getElementById(id);const N0=navigator.hardwareConcurrency||4;
 const data=await (await fetch("./dist/variants.json")).json();
 $("mcinfo").textContent="MC: "+data.mcMethod+". Сгенерировано "+data.generated;
 for(const m of data.mechanics){const o=document.createElement("option");o.value=m.id;o.textContent=`${m.title} (${m.variants.length})`;$("mech").append(o);}
@@ -21,14 +21,15 @@ const ask=(w,msg)=>new Promise(r=>{w.onmessage=e=>r(e.data);w.postMessage(msg);}
 async function runSplit(ws,spec,n0){await Promise.all(ws.map(x=>ask(x,{spec})));const t=performance.now();let next=0,ev=0;
   await Promise.all(ws.map(x=>new Promise(res=>{const go=()=>{if(next>=n0)return res();x.postMessage({i:next++});};x.onmessage=e=>{ev+=e.data.v;go();};go();})));return {ev,ms:performance.now()-t,threads:Math.min(ws.length,n0)};}
 function row(v,i){const tr=document.createElement("tr");tr.id="r"+v.id;const mc=v.mc;
-  tr.innerHTML=`<td>${i+1}</td><td class="l">${v.label}<div class="dim">${v.base}, ставка ${v.bet}</div></td><td class="l">${v.kind}</td><td>${f(mc.rtp)} <span class="dim">±${f(mc.rtpSe)}</span></td><td>${f(mc.ev,3)}</td><td class="w">…</td><td class="e">…</td><td class="z">…</td><td class="ms">…</td><td class="l n dim">MC ${mc.samples/1000}k, seed ${mc.seed}, hit ${f(mc.hitRate*100,1)}%${mc.featureRate?`, фича ${f(mc.featureRate*100,2)}%`:""}</td>`;return tr;}
+  tr.innerHTML=`<td>${i+1}</td><td class="l">${v.label}<div class="dim">${v.base}, ставка ${v.bet}</div></td><td class="l">${v.kind}</td><td>${f(mc.rtp)} <span class="dim">±${f(mc.rtpSe)}</span></td><td>${f(mc.ev,3)}</td><td class="w">—</td><td class="e">—</td><td class="z">—</td><td class="ms">—</td><td class="l n dim">MC ${mc.samples/1000}k, seed ${mc.seed}, hit ${f(mc.hitRate*100,1)}%${mc.featureRate?`, фича ${f(mc.featureRate*100,2)}%`:""}</td><td><button class="one">Посчитать</button></td>`;tr.querySelector(".one").onclick=()=>run([v]);return tr;}
 function fill(v,r){const tr=$("r"+v.id);const z=(r.ev-v.mc.ev)/v.mc.se;tr.classList.remove("run");
   tr.querySelector(".w").textContent=f(r.ev/v.bet);tr.querySelector(".e").textContent=f(r.ev,3);
   const zc=tr.querySelector(".z");zc.textContent=f(z,2);zc.className="z "+(Math.abs(z)<2?"ok":Math.abs(z)<3?"warn":"bad");
-  tr.querySelector(".ms").textContent=r.ms<10?r.ms.toFixed(2):r.ms.toFixed(0);tr.querySelector(".n").textContent+=r.threads>1?` · WASM MT ×${r.threads}`:" · WASM 1 поток";}
+  tr.querySelector(".ms").textContent=r.ms<10?r.ms.toFixed(2):r.ms.toFixed(0);const nc=tr.querySelector(".n");nc.dataset.b??=nc.textContent;nc.textContent=nc.dataset.b+(r.threads>1?` · WASM MT ×${r.threads}`:" · WASM 1 поток");}
 let gen=0;
-async function run(){const my=++gen;const m=data.mechanics.find(x=>x.id===$("mech").value);location.hash=m.id;const tb=$("tb");tb.innerHTML="";m.variants.forEach((v,i)=>tb.append(row(v,i)));
-  const n=Math.max(1,+$("nw").value||N0);$("st").textContent="готовлю потоки…";const ws=await getPool(n);const T=performance.now();
+let cur;function render(){gen++;const m=data.mechanics.find(x=>x.id===$("mech").value);cur=m;location.hash=m.id;const tb=$("tb");tb.innerHTML="";m.variants.forEach((v,i)=>tb.append(row(v,i)));$("st").textContent="";}
+async function run(list){const my=++gen;const m={variants:list};document.querySelectorAll("button,select").forEach(b=>b.disabled=true);
+  const n=N0;$("st").textContent="готовлю потоки…";const ws=await getPool(n);const T=performance.now();
   const metas=[];for(const v of m.variants)metas.push(await ask(ws[0],{meta:JSON.stringify(v.spec)}));
   const heavy=m.variants.filter((v,i)=>metas[i].meta?.n0),light=m.variants.filter((v,i)=>!metas[i].meta?.n0);
   // light kernels: one variant per worker, in parallel
@@ -36,8 +37,8 @@ async function run(){const my=++gen;const m=data.mechanics.find(x=>x.id===$("mec
   // splittable kernels: each variant across all workers
   for(const v of heavy){if(my!==gen)return;const i=m.variants.indexOf(v);$("r"+v.id).classList.add("run");$("st").textContent=`считаю ${v.id} на ${n} потоках…`;
     const r=await runSplit(ws,JSON.stringify(v.spec),metas[i].meta.n0);if(my===gen)fill(v,r);}
-  if(my===gen)$("st").textContent=`готово за ${((performance.now()-T)/1000).toFixed(1)} с`;}
-$("mech").onchange=run;$("go").onclick=()=>{poolN=0;run();};
+  if(my===gen)$("st").textContent=`готово за ${((performance.now()-T)/1000).toFixed(1)} с (${n} потоков)`;document.querySelectorAll("button,select").forEach(b=>b.disabled=false);}
+$("mech").onchange=render;$("go").onclick=()=>run(cur.variants);
 if(location.hash&&data.mechanics.some(m=>m.id===location.hash.slice(1)))$("mech").value=location.hash.slice(1);
-run();
+render();
 </script></body></html>
